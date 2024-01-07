@@ -113,7 +113,7 @@ class ProductControllers {
 
     }
     unlikeArtwork(req, res, next) {
-     
+
         try {
             // Tìm tài liệu artwork cần hủy like
             const artwork = Artwork.findById(req.query.artworkId);
@@ -140,125 +140,41 @@ class ProductControllers {
             console.error('Unlike failed:', error.message);
         }
     }
+    likeArtwork(req, res, next) {
+        try {
+            // Tìm tài liệu artwork cần thêm like
+
+            Artwork.findById(req.params.artworkId)
+                .then((artwork) => {
+                    console.log(artwork);
+                    const existingLikeIndex = artwork.likes.findIndex(like => like.user.toString() === req.params.userId);
+
+                    if (existingLikeIndex !== -1) {
+                        throw new Error('User already liked this artwork');
+                    }
+        
+                    // Thêm like mới vào mảng likes
+                    artwork.likes.push({ user: req.params.userId });
+        
+                    // Lưu cập nhật
+                    artwork.save();
+        
+                    console.log('Like successful');
+                }).catch((error) => {
+                    console.log(error);
+                });
+
+
+            // Kiểm tra xem người dùng đã like trước đó hay chưa
+    
+        } catch (error) {
+            console.error('Like failed:', error.message);
+        }
+    }
 
     post(req, res, next) {
         const formData = req.body
-        const materialArray = formData.material
         const course = new Artwork(formData)
-        console.log(Artwork.find().size);
-        // here
-        switch (materialArray[0]) {
-            case "Gỗ":
-                var numberMaterial = 0;
-                Artwork.estimatedDocumentCount({}, (err, count) => {
-                    if (err) {
-                        console.error(err);
-                    } else {
-                        if (count > 0) {
-                            Artwork.find({ materialCode: "GAA" })
-                                .then(filterProduct => {
-                                    if (filterProduct.length === 0) {
-                                        var tmpNumberMaterial = numberMaterial + 1;
-                                        course.materialName = "GAA" + addLeadingZeros(tmpNumberMaterial);
-                                        course.materialCode = "GAA";
-                                    } else {
-                                        filterProduct.forEach(product => {
-                                            var result = product.materialName.slice(3); // Loại bỏ 3 ký tự đầu
-                                            var numberResult = parseInt(result, 10); // Chuyển đổi thành số nguyên với hệ cơ số 10
-                                            if (numberResult > numberMaterial) {
-                                                numberMaterial = numberResult;
-                                            }
-                                        })
-                                        var tmpNumberMaterial = numberMaterial + 1;
-                                        course.materialName = "GAA" + addLeadingZeros(tmpNumberMaterial);
-                                        course.materialCode = "GAA";
-                                    }
-                                }).catch(err => {
-                                    console.log("Không thể lấy được thông tin của sản phẩm !!!")
-                                })
-                        } else {
-                            var tmpNumberMaterial = numberMaterial + 1;
-                            course.materialName = "GAA" + addLeadingZeros(tmpNumberMaterial);
-                            course.materialCode = "GAA";
-                        }
-                    }
-                });
-                break;
-            case "Nhựa":
-                var numberMaterial = 0;
-                Artwork.estimatedDocumentCount({}, (err, count) => {
-                    if (err) {
-                        console.error(err);
-                    } else {
-                        if (count > 0) {
-                            Artwork.find({ materialCode: "NAA" })
-                                .then(filterProduct => {
-                                    if (filterProduct.length === 0) {
-                                        var tmpNumberMaterial = numberMaterial + 1;
-                                        course.materialName = "NAA" + addLeadingZeros(tmpNumberMaterial);
-                                        course.materialCode = "NAA";
-                                    } else {
-                                        filterProduct.forEach(product => {
-                                            var result = product.materialName.slice(3); // Loại bỏ 3 ký tự đầu
-                                            var numberResult = parseInt(result, 10); // Chuyển đổi thành số nguyên với hệ cơ số 10
-                                            if (numberResult > numberMaterial) {
-                                                numberMaterial = numberResult;
-                                            }
-                                        })
-                                        var tmpNumberMaterial = numberMaterial + 1;
-                                        course.materialName = "NAA" + addLeadingZeros(tmpNumberMaterial);
-                                        course.materialCode = "NAA";
-                                    }
-                                }).catch(err => {
-                                    console.log("Không thể lấy được thông tin của sản phẩm !!!")
-                                })
-                        } else {
-                            var tmpNumberMaterial = numberMaterial + 1;
-                            course.materialName = "NAA" + addLeadingZeros(tmpNumberMaterial);
-                            course.materialCode = "NAA";
-                        }
-                    }
-                });
-                break;
-            case "Kim loại":
-                var numberMaterial = 0;
-                Artwork.estimatedDocumentCount({}, (err, count) => {
-                    if (err) {
-                        console.error(err);
-                    } else {
-                        if (count > 0) {
-                            Artwork.find({ materialCode: "KAA" })
-                                .then(filterProduct => {
-                                    if (filterProduct.length === 0) {
-                                        var tmpNumberMaterial = numberMaterial + 1;
-                                        course.materialName = "KAA" + addLeadingZeros(tmpNumberMaterial);
-                                        course.materialCode = "KAA";
-                                    } else {
-                                        filterProduct.forEach(product => {
-                                            var result = product.materialName.slice(3); // Loại bỏ 3 ký tự đầu
-                                            var numberResult = parseInt(result, 10); // Chuyển đổi thành số nguyên với hệ cơ số 10
-                                            if (numberResult > numberMaterial) {
-                                                numberMaterial = numberResult;
-                                            }
-                                        })
-                                        var tmpNumberMaterial = numberMaterial + 1;
-                                        course.materialName = "KAA" + addLeadingZeros(tmpNumberMaterial);
-                                        course.materialCode = "KAA";
-                                    }
-                                }).catch(err => {
-                                    console.log("Không thể lấy được thông tin của sản phẩm !!!")
-                                })
-                        } else {
-                            var tmpNumberMaterial = numberMaterial + 1;
-                            course.materialName = "KAA" + addLeadingZeros(tmpNumberMaterial);
-                            course.materialCode = "KAA";
-                        }
-                    }
-                });
-                break;
-        }
-        // here
-        // save thông tin
         course.save()
             .then(() => res.json(req.body))
             .catch((error) => {

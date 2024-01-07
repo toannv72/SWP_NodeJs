@@ -1,11 +1,11 @@
 const express = require('express')
 const routerProduct = express.Router()
-const ProductControllers = require('../app/controllers/ProductControllers')
+const ProductControllers = require('../app/controllers/ArtworkControllers')
 const { authenticatedStaff } = require('../config/db/authenticatedStaff')
 
 routerProduct
     .route("/countByProduct")
-    .get( ProductControllers.countByProduct)
+    .get(ProductControllers.countByProduct)
 // xóa mềm
 routerProduct.delete('/:id', authenticatedStaff, ProductControllers.delete)
 
@@ -23,9 +23,10 @@ routerProduct.get('/sold', ProductControllers.showSold)
 // lấy sản phẩm theo ID 
 
 routerProduct.get('/:id', ProductControllers.get)
-routerProduct.delete('/:artworkId/:userId', ProductControllers.unlikeArtwork)
+routerProduct.post('/likeArtwork/:artworkId/:userId', ProductControllers.likeArtwork)
+routerProduct.post('/unlikeArtwork/:artworkId/:userId', ProductControllers.unlikeArtwork)
 routerProduct.put('/:id', ProductControllers.put)
-routerProduct.post('/', authenticatedStaff, ProductControllers.post)
+routerProduct.post('/', ProductControllers.post)
 routerProduct.get('/', ProductControllers.show)
 
 module.exports = routerProduct

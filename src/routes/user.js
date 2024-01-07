@@ -28,7 +28,7 @@ routerUser
     
 routerUser
     .route("/")
-    .get(authenticatedAdmin, UserController.get)
+    .get( UserController.get)
     .post(UserController.post)
 
 
