@@ -171,7 +171,31 @@ class ProductControllers {
             console.error('Like failed:', error.message);
         }
     }
+    cmtArtwork(req, res, next) {
+        try {
+            // Tìm tài liệu artwork cần thêm like
+            Artwork.findById(req.params.artworkId)
+                .then((artwork) => {
+                    // const existingLikeIndex = artwork.comments.findIndex(like => like.user.toString() === req.params.userId);
+                    // if (existingLikeIndex !== -1) {
+                    //     throw new Error('User already liked this artwork');
+                    // }
+                    // Thêm like mới vào mảng comments
+                    artwork.comments.push({ user: req.params.userId ,content: req.body.content });
+                    // Lưu cập nhật
+                    artwork.save();
+                }).catch((error) => {
+                    console.log(1111111111111111111,error);
+                });
 
+
+            // Kiểm tra xem người dùng đã like trước đó hay chưa
+
+    
+        } catch (error) {
+            console.error('Like failed:', error.message);
+        }
+    }
     post(req, res, next) {
         const formData = req.body
         const course = new Artwork(formData)
