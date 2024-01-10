@@ -116,26 +116,27 @@ class ProductControllers {
 
         try {
             // Tìm tài liệu artwork cần hủy like
-            const artwork = Artwork.findById(req.query.artworkId);
+            console.log(111111111111);
+            Artwork.findById(req.params.artworkId)
+                .then((artwork) => {
+                    if (!artwork) {
+                        return res.status(404).json({ message: 'Artwork not found' });
+                    }
+                    const existingLikeIndex = artwork.likes.findIndex(like => like.user.toString() === req.params.userId);
 
-            if (!artwork) {
-                throw new Error('Artwork not found');
-            }
+                   
 
-            // Tìm index của like trong mảng likes
-            const likeIndex = artwork.likes.findIndex(like => like.user.toString() === req.query.userId);
+                    // Thêm like mới vào mảng likes
+                    artwork.likes.splice(existingLikeIndex, 1);
 
-            if (likeIndex === -1) {
-                throw new Error('Like not found');
-            }
+                    // Lưu cập nhật
+                    artwork.save();
 
-            // Loại bỏ like khỏi mảng likes
-            artwork.likes.splice(likeIndex, 1);
+                    console.log('UnLike successful');
+                }).catch((error) => {
+                    console.log(error);
+                });
 
-            // Lưu cập nhật
-            artwork.save();
-
-            console.log('Unlike successful');
         } catch (error) {
             console.error('Unlike failed:', error.message);
         }
@@ -146,19 +147,14 @@ class ProductControllers {
 
             Artwork.findById(req.params.artworkId)
                 .then((artwork) => {
-                    console.log(artwork);
                     const existingLikeIndex = artwork.likes.findIndex(like => like.user.toString() === req.params.userId);
-
                     if (existingLikeIndex !== -1) {
                         throw new Error('User already liked this artwork');
                     }
-        
                     // Thêm like mới vào mảng likes
                     artwork.likes.push({ user: req.params.userId });
-        
                     // Lưu cập nhật
                     artwork.save();
-        
                     console.log('Like successful');
                 }).catch((error) => {
                     console.log(error);
@@ -166,7 +162,7 @@ class ProductControllers {
 
 
             // Kiểm tra xem người dùng đã like trước đó hay chưa
-    
+
         } catch (error) {
             console.error('Like failed:', error.message);
         }
@@ -181,17 +177,17 @@ class ProductControllers {
                     //     throw new Error('User already liked this artwork');
                     // }
                     // Thêm like mới vào mảng comments
-                    artwork.comments.push({ user: req.params.userId ,content: req.body.content });
+                    artwork.comments.push({ user: req.params.userId, content: req.body.content });
                     // Lưu cập nhật
                     artwork.save();
                 }).catch((error) => {
-                    console.log(1111111111111111111,error);
+                    console.log(1111111111111111111, error);
                 });
 
 
             // Kiểm tra xem người dùng đã like trước đó hay chưa
 
-    
+
         } catch (error) {
             console.error('Like failed:', error.message);
         }

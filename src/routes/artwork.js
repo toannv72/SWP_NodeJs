@@ -23,8 +23,8 @@ routerProduct.get('/sold', ProductControllers.showSold)
 // lấy sản phẩm theo ID 
 
 routerProduct.get('/:id', ProductControllers.get)
-routerProduct.post('/likeArtwork/:artworkId/:userId', ProductControllers.likeArtwork)
 routerProduct.post('/unlikeArtwork/:artworkId/:userId', ProductControllers.unlikeArtwork)
+routerProduct.post('/likeArtwork/:artworkId/:userId', ProductControllers.likeArtwork)
 routerProduct.post('/comments/:artworkId/:userId', ProductControllers.cmtArtwork)
 routerProduct.put('/:id', ProductControllers.put)
 routerProduct.post('/', ProductControllers.post)
