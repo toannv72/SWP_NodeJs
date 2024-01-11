@@ -64,6 +64,7 @@ const artwork  = new Schema({
     },
     view: { type: Number, default: 0 },
     image: [{ type: String }],
+    genre: [{ type: String }],
     deletedAt: { type: String, maxLength: 255, default: null },
     likes: [likeSchema],
     report: [reportSchema],

@@ -2,7 +2,7 @@ const Order = require('../models/Order');
 var bcrypt = require('bcryptjs');
 const Token = require('../../config/db/config');
 var jwt = require('jsonwebtoken');
-const Artwork= require('../models/Artwork');
+const Product= require('../models/Product');
 const moment = require('moment');
 class OrderController {
 
@@ -522,7 +522,7 @@ class OrderController {
                 const quantityToReduce = products[i].quantity;
                 try {
                     // Kiểm tra xem sản phẩm có đủ số lượng trong kho không
-                    const dbProduct = await Artwork.findById(productId);
+                    const dbProduct = await Product.findById(productId);
                     if (!dbProduct || dbProduct.quantity < quantityToReduce) {
                         return res.status(400).json({ error: `Sản phẩm ${dbProduct.name} không đủ trong kho.` });
                     }
@@ -545,12 +545,12 @@ class OrderController {
             const productId = products[i]._id;
             const quantityToReduce = products[i].quantity;
             // Kiểm tra xem sản phẩm có đủ số lượng trong kho không
-            Artwork.findById(productId)
+            Product.findById(productId)
                 .then((dbProduct) => {
                     const a = dbProduct.quantity - quantityToReduce;
                     const b = dbProduct.sold + quantityToReduce;
-                    Artwork.findByIdAndUpdate(dbProduct._id, { quantity: a, sold: b })
-                        .then((Artwork) => {
+                    Product.findByIdAndUpdate(dbProduct._id, { quantity: a, sold: b })
+                        .then((Product) => {
 
                         })
                 })
@@ -649,12 +649,12 @@ class OrderController {
             const productId = products[i]._id;
             const quantityToReduce = products[i].quantity;
             // Kiểm tra xem sản phẩm có đủ số lượng trong kho không
-            Artwork.findById(productId)
+            Product.findById(productId)
                 .then((dbProduct) => {
                     const a = dbProduct.quantity - quantityToReduce;
                     const b = dbProduct.sold + quantityToReduce;
-                    Artwork.findByIdAndUpdate(dbProduct._id, { quantity: a, sold: b })
-                        .then((Artwork) => {
+                    Product.findByIdAndUpdate(dbProduct._id, { quantity: a, sold: b })
+                        .then((Product) => {
 
                         })
                 })
@@ -846,8 +846,8 @@ class OrderController {
 
     delete(req, res, next) {
         Order.delete({ _id: req.params.id })
-            .then((Artwork => {
-                res.send(Artwork)
+            .then((Product => {
+                res.send(Product)
             }
             ))
             .catch(next => res.status(500).json({ error: 'Could not retrieve product.' }))

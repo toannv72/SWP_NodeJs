@@ -29,7 +29,7 @@ const User = new Schema({
     followAdd: [followAddSchema],
     phone: { type: String, maxLength: 255 },
     email: { type: String, maxLength: 255 },
-    money: { type: Number ,default: 0, },
+    money: { type: Number, default: 0, },
     address: { type: String, maxLength: 255, default: '' },
     name: { type: String, maxLength: 255, default: '' },
     avatar: { type: String, maxLength: 255, default: '' },
