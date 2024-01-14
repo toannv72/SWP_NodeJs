@@ -7,7 +7,7 @@ routerProduct
     .route("/countByProduct")
     .get(ProductControllers.countByProduct)
 // xóa mềm
-routerProduct.delete('/:id', authenticatedStaff, ProductControllers.delete)
+routerProduct.delete('/:id',  ProductControllers.delete)
 
 // khôi phục dữ liệu đã xóa
 routerProduct.put('/restore/:id', authenticatedStaff, ProductControllers.restore)
@@ -16,6 +16,7 @@ routerProduct.get('/trash', authenticatedStaff, ProductControllers.trash)
 routerProduct.get('/search?', ProductControllers.search)
 
 routerProduct.get('/staff', ProductControllers.showProductStaff)
+routerProduct.get('/user/:id', ProductControllers.showProductUser)
 // sắp xếp sản phẩm theo thứ tự bán chạy
 routerProduct.get('/sold', ProductControllers.showSold)
 // lấy sản phẩm theo ID 
