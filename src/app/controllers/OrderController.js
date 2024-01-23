@@ -2,7 +2,7 @@ const Order = require('../models/Order');
 var bcrypt = require('bcryptjs');
 const Token = require('../../config/db/config');
 var jwt = require('jsonwebtoken');
-const Product= require('../models/Product');
+const Product = require('../models/Product');
 const moment = require('moment');
 class OrderController {
 
@@ -203,7 +203,7 @@ class OrderController {
                 sort: { updatedAt: sort },
             };
             var checkTokenValid = jwt.verify(req.cookies.accessToken, Token.refreshToken);
-            Order.paginate({ user: checkTokenValid.user._id, status: "Canceled" }, options)
+            Order.paginate({ user: checkTokenValid.user._id, status: "Cancelled" }, options)
                 .then((order) => {
                     res.json(order);
                 })
@@ -406,7 +406,7 @@ class OrderController {
                 },
                 sort: { updatedAt: sort },
             };
-            Order.paginate({ status: "Canceled" }, options)
+            Order.paginate({ status: "Cancelled" }, options)
                 .then((order) => {
                     res.json(order);
                 })
@@ -622,14 +622,15 @@ class OrderController {
             console.log(333333333333333, secureHash);
             if (req.query.vnp_TransactionStatus == "00") {
 
-                Order.findByIdAndUpdate(req.params.id, { payment: 'Transfer' })
+                Order.findByIdAndUpdate(req.params.id, { payment: 'Transfer',status:'Processing' })
                     .then(() => {
                         res.json({ message: 'Orders updated successfully.' });
                     })
 
             } else {
-                Order.findByIdAndUpdate(req.params.id, { payment: 'Cancel' })
+                Order.findByIdAndUpdate(req.params.id, { payment: 'Cancelled', status: 'Cancelled' })
                     .then(() => {
+
                         res.json({ message: 'Orders updated successfully.' });
                     })
             }

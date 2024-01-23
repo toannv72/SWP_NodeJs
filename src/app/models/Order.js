@@ -19,11 +19,11 @@ const OrderSchema = new mongoose.Schema({
     phone: { type: String, maxLength: 255 ,required: true},
     status: {
         type: String,
-        enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Canceled', 'Returned'],
+        enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'],
         default: 'Pending', // Trạng thái mặc định là "Chờ xử lý"
     },
     payment: { type: String, maxLength:255,
-        enum: ['Cash', 'Transfer', 'Pending','Cancel' ],
+        enum: ['Cash', 'Transfer', 'Pending','Cancelled' ],
         default: 'Pending', // Trạng thái mặc định là "Chờ xử lý"
     },
     deletedAt: { type: String, maxLength: 255, default: null },

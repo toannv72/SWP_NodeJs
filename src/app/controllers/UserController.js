@@ -19,8 +19,59 @@ class UserController {
                 res.json(next)
             )
     }
+    followUser(req, res, next) {
+        try {
+            // Tìm tài liệu artwork cần thêm like
+         
+            User.findById(req.params.id)
+                .then((follow) => {
+                    const existingLikeIndex = follow.follow.findIndex(follows => follows.user.toString() === req.params.userId);
+                    if (existingLikeIndex !== -1) {
+                        return res.json({ message: 'Users have followed this ' })
+                    }
+                    follow.follow.push({ user: req.params.userId });
+                    follow.save();
+                    User.findById(req.params.userId)
+                        .then((followAdd) => {
+                            const existingFollowAddIndex = followAdd.followAdd.findIndex(followAdd => followAdd.user.toString() === req.params.id);
+                            if (existingFollowAddIndex !== -1) {
+                                return res.json({ message: 'Users have followed this1' })
+                            }
+                            followAdd.followAdd.push({ user: req.params.id });
+                            followAdd.save();
+                            return res.json(follow)
+                        })
+                }).catch((error) => {
+                    return res.json(error)
 
+                });
+        } catch (error) {
+            console.error('follow failed:', error);
+        }
+    }
+    undFollowUser(req, res, next) {
+        try {
+            // Tìm tài liệu artwork cần thêm like
+            User.findById(req.params.id)
+                .then((follow) => {
+                  
+                    follow.follow.splice({ user: req.params.userId });
+                    follow.save();
+                    User.findById(req.params.userId)
+                        .then((followAdd) => {
+                        
+                            followAdd.followAdd.splice({ user: req.params.id });
+                            followAdd.save();
+                            return res.json(follow)
+                        })
+                }).catch((error) => {
+                    return res.json(error)
 
+                });
+        } catch (error) {
+            console.error('follow failed:', error);
+        }
+    }
     trash(req, res, next) {
         User.findDeleted()
             .then(courses =>
@@ -218,8 +269,8 @@ class UserController {
     delete(req, res, next) {
         User.findById(req.params.id)
             .then((data => {
-                console.log(1111111111111111,data.role)
-                if (data.role==='admin') {
+                console.log(1111111111111111, data.role)
+                if (data.role === 'admin') {
                     res.status(500).json({ error: 'Không thể xóa tài khoản này' })
                 } else {
                     User.delete({ _id: req.params.id })

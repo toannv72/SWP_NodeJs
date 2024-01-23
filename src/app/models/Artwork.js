@@ -30,30 +30,6 @@ const reportSchema = new Schema({
     createdAt: { type: Date, default: Date.now },
 });
 
-// const artwork  = new Schema({
-//     name: { type: String, required: true },
-//     user: {
-//         type: mongoose.Schema.Types.ObjectId,
-//         ref: 'user', // Tham chiếu đến schema người dùng
-//         required: true,
-//     },
-//     price: { type: Number, required: true },
-//     reducedPrice: { type: Number, required: true },
-//     quantity: { type: Number, required: true },
-//     models: { type: String, default: '' },
-//     shape: { type: String, default: '' },
-//     material: [{ type: String }],
-//     accessory: { type: String, default: '' },
-//     sold: { type: Number, default: 0 },
-//     image: [{ type: String }],
-//     description: { type: String, default: '' },
-//     deletedAt: { type: String, maxLength: 255, default: null },
-//     likes: [likeSchema],
-//     comments: [commentSchema],
-//     slug: { type: String, slug: 'name', unique: true },
-// }, {
-//     timestamps: true
-// })
 
 const artwork  = new Schema({
     content:{type: String,},

@@ -22,6 +22,8 @@ routerArtwork.get('/sold', ProductControllers.showSold)
 // routerArtwork.get('/sold', ProductControllers.showSold)
 // lấy sản phẩm theo ID 
 
+routerArtwork.get('/random', ProductControllers.showRandom)
+routerArtwork.get('/follow/:id', ProductControllers.showFollow)
 routerArtwork.get('/:id', ProductControllers.get)
 // lấy theo user
 routerArtwork.get('/user/:id/', ProductControllers.getArtworkUser)

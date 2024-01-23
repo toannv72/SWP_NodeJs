@@ -1,8 +1,7 @@
 const { addLeadingZeros } = require('../../util/UtilsFuntion');
 const Artwork = require('../models/Artwork');
+const User = require('../models/User');
 class ProductControllers {
-
-
     put(req, res, next) {
 
         Artwork.findByIdAndUpdate(req.params.id,
@@ -15,7 +14,6 @@ class ProductControllers {
                 res.json(next)
             )
     }
-
 
     trash(req, res, next) {
         Artwork.findDeleted()
@@ -116,24 +114,17 @@ class ProductControllers {
 
         try {
             // Tìm tài liệu artwork cần hủy like
-            console.log(111111111111);
             Artwork.findById(req.params.artworkId)
                 .then((artwork) => {
                     if (!artwork) {
                         return res.status(404).json({ message: 'Artwork not found' });
                     }
                     const existingLikeIndex = artwork.likes.findIndex(like => like.user.toString() === req.params.userId);
-
-                   
-
                     // Thêm like mới vào mảng likes
                     artwork.likes.splice(existingLikeIndex, 1);
-
                     // Lưu cập nhật
                     artwork.save();
                     return res.json(artwork)
-
-
                 }).catch((error) => {
                     return res.json(error)
 
@@ -186,7 +177,7 @@ class ProductControllers {
                     return res.json(artwork)
 
                 }).catch((error) => {
-                    console.log(1111111111111111111, error);
+                    return res.json(error)
                 });
 
 
@@ -194,7 +185,7 @@ class ProductControllers {
 
 
         } catch (error) {
-            console.error('Like failed:', error.message);
+            return res.json(error)
         }
     }
     post(req, res, next) {
@@ -213,13 +204,8 @@ class ProductControllers {
         const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
         const limit = parseInt(req.query.limit) || 10000000000;
         const sort = parseInt(req.query.sort) || -1;
-        const sortPrice = parseInt(req.query.sortPrice)
-        const minPrice = parseInt(req.query.minPrice) || 0;
-        const maxPrice = parseInt(req.query.maxPrice) || 10000000000;
         var sorts = { createdAt: sort }
-        if (sortPrice) {
-            sorts = { reducedPrice: sortPrice }
-        }
+
         const options = {
             page: page,
             limit: limit,
@@ -233,6 +219,68 @@ class ProductControllers {
             return res.json(result)
         })
     }
+    showFollow(req, res, next) {
+        const userId = req.params.id; // Lấy _id của người dùng từ request, bạn cần đảm bảo rằng đã xác thực người dùng và có thông tin người dùng trong request
+
+        // Bước 1: Tìm người dùng dựa trên _id
+        User.findById(userId)
+            .then((user) => {
+                if (!user) {
+                    return res.status(404).json({ error: 'User not found' });
+                }
+                // Bước 2: Lấy danh sách các người dùng mà người dùng đã follow
+                const followedUsers = user.followAdd.map(follow => follow.user);
+
+                // Bước 3: Sử dụng danh sách đã follow để tìm các bài viết
+                const options = {
+                    page: parseInt(req.query.page) || 1,
+                    limit: parseInt(req.query.limit) || 10000000000,
+                    collation: {
+                        locale: 'en',
+                    },
+                    sort: { createdAt: parseInt(req.query.sort) || -1 },
+                };
+
+                Artwork.paginate({ user: { $in: followedUsers } }, options, (err, result) => {
+                    if (err) {
+                        return res.status(500).json({ error: err.message });
+                    }
+
+                    return res.json(result);
+                });
+            });
+    }
+    showRandom(req, res, next) {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10000000000;
+
+        const options = {
+            page: page,
+            limit: limit,
+            // Tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
+            collation: {
+                locale: 'en',
+            },
+        };
+
+        Artwork.countDocuments().exec(function (err, count) {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+
+            const randomSkip = Math.floor(Math.random() * count);
+
+            options.sort = { _id: 1 }; // Sắp xếp theo _id để đảm bảo ngẫu nhiên
+
+            Artwork.paginate({}, options, function (err, result) {
+                if (err) {
+                    return res.status(500).json({ error: err.message });
+                }
+                return res.json(result);
+            });
+        });
+    }
+
     getArtworkUser(req, res, next) {
         const id = req.params.id
         const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
@@ -254,7 +302,7 @@ class ProductControllers {
             },
             sort: sorts,
         };
-        const query = { user: id }  ;
+        const query = { user: id };
         Artwork.paginate(query, options, function (err, result) {
             return res.json(result)
         })

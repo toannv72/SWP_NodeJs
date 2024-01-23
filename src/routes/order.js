@@ -22,7 +22,7 @@ routerOrder
     .route("/user/delivered")
     .get(OrderController.getUserDelivered)
 routerOrder
-    .route("/user/canceled")
+    .route("/user/Cancelled")
     .get(OrderController.getUserCanceled)
 routerOrder
     .route("/user/returned")
@@ -45,7 +45,7 @@ routerOrder
     .route("/admin/delivered")
     .get(OrderController.getAdminDelivered)
 routerOrder
-    .route("/admin/canceled")
+    .route("/admin/Cancelled")
     .get(OrderController.getAdminCanceled)
 routerOrder
     .route("/admin/returned")
