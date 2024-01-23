@@ -203,7 +203,7 @@ class OrderController {
                 sort: { updatedAt: sort },
             };
             var checkTokenValid = jwt.verify(req.cookies.accessToken, Token.refreshToken);
-            Order.paginate({ user: checkTokenValid.user._id, status: "Cancelled" }, options)
+            Order.paginate({ user: checkTokenValid.user._id, status: "Canceled" }, options)
                 .then((order) => {
                     res.json(order);
                 })
@@ -263,6 +263,7 @@ class OrderController {
 
     getAdminPending(req, res, next) {
         try {
+            var checkTokenValid = jwt.verify(req.cookies.accessToken, Token.refreshToken);
             const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
             const limit = parseInt(req.query.limit) || 10000000000;
             const sort = parseInt(req.query.sort) || -1;
@@ -274,7 +275,7 @@ class OrderController {
                 },
                 sort: { updatedAt: sort },
             };
-            Order.paginate({ status: "Pending" }, options)
+            Order.paginate({ status: "Pending", seller: checkTokenValid.user._id }, options)
                 .then((order) => {
                     res.json(order);
                 })
@@ -285,6 +286,7 @@ class OrderController {
     }
     getAdminProcessing(req, res, next) {
         try {
+            var checkTokenValid = jwt.verify(req.cookies.accessToken, Token.refreshToken);
             const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
             const limit = parseInt(req.query.limit) || 10000000000;
             const sort = parseInt(req.query.sort) || -1;
@@ -296,7 +298,7 @@ class OrderController {
                 },
                 sort: { updatedAt: sort },
             };
-            Order.paginate({ status: "Processing" }, options)
+            Order.paginate({ status: "Processing", seller: checkTokenValid.user._id }, options)
                 .then((order) => {
                     res.json(order);
                 })
@@ -307,6 +309,7 @@ class OrderController {
     }
     getAdminProcessing(req, res, next) {
         try {
+            var checkTokenValid = jwt.verify(req.cookies.accessToken, Token.refreshToken);
             const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
             const limit = parseInt(req.query.limit) || 10000000000;
             const sort = parseInt(req.query.sort) || -1;
@@ -318,7 +321,7 @@ class OrderController {
                 },
                 sort: { updatedAt: sort },
             };
-            Order.paginate({ status: "Processing" }, options)
+            Order.paginate({ status: "Processing", seller: checkTokenValid.user._id }, options)
                 .then((order) => {
                     res.json(order);
                 })
@@ -329,6 +332,7 @@ class OrderController {
     }
     getAdminProcessing(req, res, next) {
         try {
+            var checkTokenValid = jwt.verify(req.cookies.accessToken, Token.refreshToken);
             const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
             const limit = parseInt(req.query.limit) || 10000000000;
             const sort = parseInt(req.query.sort) || -1;
@@ -340,7 +344,7 @@ class OrderController {
                 },
                 sort: { updatedAt: sort },
             };
-            Order.paginate({ status: "Processing" }, options)
+            Order.paginate({ status: "Processing", seller: checkTokenValid.user._id }, options)
                 .then((order) => {
                     res.json(order);
                 })
@@ -351,6 +355,7 @@ class OrderController {
     }
     getAdminShipped(req, res, next) {
         try {
+            var checkTokenValid = jwt.verify(req.cookies.accessToken, Token.refreshToken);
             const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
             const limit = parseInt(req.query.limit) || 10000000000;
             const sort = parseInt(req.query.sort) || -1;
@@ -362,7 +367,7 @@ class OrderController {
                 },
                 sort: { updatedAt: sort },
             };
-            Order.paginate({ status: "Shipped" }, options)
+            Order.paginate({ status: "Shipped", seller: checkTokenValid.user._id }, options)
                 .then((order) => {
                     res.json(order);
                 })
@@ -373,6 +378,7 @@ class OrderController {
     }
     getAdminDelivered(req, res, next) {
         try {
+            var checkTokenValid = jwt.verify(req.cookies.accessToken, Token.refreshToken);
             const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
             const limit = parseInt(req.query.limit) || 10000000000;
             const sort = parseInt(req.query.sort) || -1;
@@ -384,7 +390,7 @@ class OrderController {
                 },
                 sort: { updatedAt: sort },
             };
-            Order.paginate({ status: "Delivered" }, options)
+            Order.paginate({ status: "Delivered", seller: checkTokenValid.user._id }, options)
                 .then((order) => {
                     res.json(order);
                 })
@@ -395,6 +401,7 @@ class OrderController {
     }
     getAdminCanceled(req, res, next) {
         try {
+            var checkTokenValid = jwt.verify(req.cookies.accessToken, Token.refreshToken);
             const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
             const limit = parseInt(req.query.limit) || 10000000000;
             const sort = parseInt(req.query.sort) || -1;
@@ -406,7 +413,7 @@ class OrderController {
                 },
                 sort: { updatedAt: sort },
             };
-            Order.paginate({ status: "Cancelled" }, options)
+            Order.paginate({ status: "Cancelled", seller: checkTokenValid.user._id }, options)
                 .then((order) => {
                     res.json(order);
                 })
@@ -417,6 +424,7 @@ class OrderController {
     }
     getAdminReturned(req, res, next) {
         try {
+            var checkTokenValid = jwt.verify(req.cookies.accessToken, Token.refreshToken);
             const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
             const limit = parseInt(req.query.limit) || 10000000000;
             const sort = parseInt(req.query.sort) || -1;
@@ -428,7 +436,7 @@ class OrderController {
                 },
                 sort: { updatedAt: sort },
             };
-            Order.paginate({ status: "Returned" }, options)
+            Order.paginate({ status: "Returned", seller: checkTokenValid.user._id }, options)
                 .then((order) => {
                     res.json(order);
                 })
@@ -439,6 +447,7 @@ class OrderController {
     }
     getAdminAll(req, res, next) {
         try {
+            var checkTokenValid = jwt.verify(req.cookies.accessToken, Token.refreshToken);
             const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
             const limit = parseInt(req.query.limit) || 10000000000;
             const sort = parseInt(req.query.sort) || -1;
@@ -450,7 +459,7 @@ class OrderController {
                 },
                 sort: { updatedAt: sort },
             };
-            Order.paginate({}, options)
+            Order.paginate({ seller: checkTokenValid.user._id }, options)
                 .then((order) => {
                     res.json(order);
                 })
@@ -516,16 +525,20 @@ class OrderController {
     check(req, res, next) {
         const { products } = req.body;
 
-        async function checkProducts() {
+        function checkProducts() {
             for (var i = 0; i < products.length; i++) {
                 const productId = products[i]._id;
                 const quantityToReduce = products[i].quantity;
                 try {
                     // Kiểm tra xem sản phẩm có đủ số lượng trong kho không
-                    const dbProduct = await Product.findById(productId);
-                    if (!dbProduct || dbProduct.quantity < quantityToReduce) {
-                        return res.status(400).json({ error: `Sản phẩm ${dbProduct.name} không đủ trong kho.` });
-                    }
+                    Product.findById(productId)
+                        .then((dbProduct) => {
+
+                            console.log(11111111, dbProduct);
+                            if (!dbProduct || dbProduct.quantity < quantityToReduce) {
+                                return res.status(500).json({ error: `Sản phẩm ${dbProduct?.name} không đủ trong kho.` });
+                            }
+                        })
                 } catch (error) {
                     return res.status(500).json(error);
                 }
@@ -539,7 +552,7 @@ class OrderController {
     }
     post(req, res, next) {
         var checkTokenValid = jwt.verify(req.cookies.accessToken, Token.refreshToken);
-        const { products, totalAmount, shippingAddress, status, description, email, name, phone, payment } = req.body;
+        const { products, totalAmount, shippingAddress, status, description, email, name, phone, payment, seller } = req.body;
 
         for (var i = 0; i < products.length; i++) {
             const productId = products[i]._id;
@@ -568,6 +581,7 @@ class OrderController {
             description,
             status,
             email,
+            seller,
             name,
             phone
         });
@@ -622,7 +636,7 @@ class OrderController {
             console.log(333333333333333, secureHash);
             if (req.query.vnp_TransactionStatus == "00") {
 
-                Order.findByIdAndUpdate(req.params.id, { payment: 'Transfer',status:'Processing' })
+                Order.findByIdAndUpdate(req.params.id, { payment: 'Transfer', status: 'Processing' })
                     .then(() => {
                         res.json({ message: 'Orders updated successfully.' });
                     })
