@@ -47,7 +47,7 @@ routerOrder
     .route("/admin/delivered")
     .get(OrderController.getAdminDelivered)
 routerOrder
-    .route("/admin/Cancelled")
+    .route("/admin/Canceled")
     .get(OrderController.getAdminCanceled)
 routerOrder
     .route("/admin/returned")
@@ -59,7 +59,7 @@ routerOrder
 
 routerOrder
     .route("/admin/put/:status")
-    .put(authenticatedStaff, OrderController.putAdminStatus)
+    .put( OrderController.putAdminStatus)
 
 routerOrder
     .route("/user/put/:id")

@@ -413,7 +413,7 @@ class OrderController {
                 },
                 sort: { updatedAt: sort },
             };
-            Order.paginate({ status: "Cancelled", seller: checkTokenValid.user._id }, options)
+            Order.paginate({ status: "Canceled", seller: checkTokenValid.user._id }, options)
                 .then((order) => {
                     res.json(order);
                 })
