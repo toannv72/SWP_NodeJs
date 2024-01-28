@@ -64,19 +64,91 @@ class ProductControllers {
                 })
                 .catch(next)
         } else {
-            Artwork.paginate({ name: { $regex: regex } }, options, function (err, result) {
+            Artwork.paginate({ content: { $regex: regex } }, options, function (err, result) {
+
+                // if (result.totalPages < result.page) {
+                //     const options1 = {
+                //         page: result.totalPages,
+                //         limit: 9,
+
+                //         // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
+                //         collation: {
+                //             locale: 'en',
+                //         },
+                //     };
+                //     Artwork.paginate({ content: { $regex: escapedSearchTerm } }, options1, function (err, data) {
+
+
+                //         return res.json(
+                //             {
+                //                 products: (data.docs),
+                //                 totalPages: data.totalPages,
+                //                 page: result.totalPages,
+                //                 prevPage: data.prevPage,
+                //                 nextPage: data.nextPage,
+                //                 totalDocs: data.totalDocs,
+                //                 search: formData
+                //             })
+
+                //     })
+
+                // } else {
+
+                    return res.json(
+                        {
+                            products: (result.docs),
+                            totalPages: result.totalPages,
+                            page: result.page,
+                            prevPage: result.prevPage,
+                            nextPage: result.nextPage,
+                            totalDocs: result.totalDocs,
+                            search: formData
+                        })
+                // }
+            });
+        }
+
+
+    }
+
+    searchGenre(req, res, next) {
+        function escapeRegExp(text) {
+            return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+        }
+        const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
+        const limit = parseInt(req.query.limit) || 15; // Số lượng phần tử trên mỗi trang, mặc định là 10
+        const formData = req.query.name
+        const escapedSearchTerm = escapeRegExp(formData);
+        const regex = new RegExp(escapedSearchTerm, 'i');
+        const options = {
+            page: page,
+            limit: limit,
+
+            // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
+            collation: {
+                locale: 'en',
+            },
+        };
+        if (formData === "") {
+
+            Artwork.find({})
+                .then((movies) => {
+                    res.json({ "movie": [movies] })
+                })
+                .catch(next)
+        } else {
+            Artwork.paginate({ genre: { $regex: regex } }, options, function (err, result) {
 
                 if (result.totalPages < result.page) {
                     const options1 = {
                         page: result.totalPages,
                         limit: 9,
-
                         // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
                         collation: {
                             locale: 'en',
                         },
                     };
-                    Artwork.paginate({ name: { $regex: escapedSearchTerm } }, options1, function (err, data) {
+                    Artwork.paginate({ genre: { $regex: escapedSearchTerm } }, options1, function (err, data) {
 
 
                         return res.json(

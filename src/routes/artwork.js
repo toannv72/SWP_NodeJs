@@ -14,6 +14,7 @@ routerArtwork.put('/restore/:id', authenticatedStaff, ProductControllers.restore
 // danh sách đã xóa 
 routerArtwork.get('/trash', authenticatedStaff, ProductControllers.trash)
 routerArtwork.get('/search?', ProductControllers.search)
+routerArtwork.get('/searchGenre?', ProductControllers.searchGenre)
 
 routerArtwork.get('/staff', ProductControllers.showProductStaff)
 // sắp xếp sản phẩm theo thứ tự bán chạy

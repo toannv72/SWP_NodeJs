@@ -22,6 +22,10 @@ routerUser
     .route("/trash")
     .get(authenticatedAdmin, UserController.trash)
 
+routerUser
+    .route("/search")
+    .get( UserController.search)
+
 routerUser.put('/restore/:id',
     authenticatedAdmin, UserController.restore)
 

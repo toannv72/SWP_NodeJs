@@ -22,7 +22,7 @@ class UserController {
     followUser(req, res, next) {
         try {
             // Tìm tài liệu artwork cần thêm like
-         
+
             User.findById(req.params.id)
                 .then((follow) => {
                     const existingLikeIndex = follow.follow.findIndex(follows => follows.user.toString() === req.params.userId);
@@ -54,12 +54,12 @@ class UserController {
             // Tìm tài liệu artwork cần thêm like
             User.findById(req.params.id)
                 .then((follow) => {
-                  
+
                     follow.follow.splice({ user: req.params.userId });
                     follow.save();
                     User.findById(req.params.userId)
                         .then((followAdd) => {
-                        
+
                             followAdd.followAdd.splice({ user: req.params.id });
                             followAdd.save();
                             return res.json(follow)
@@ -175,58 +175,22 @@ class UserController {
                 locale: 'en',
             },
         };
-        if (formData === "") {
 
-            User.find({})
-                .then((movies) => {
-                    res.json({ "movie": [movies] })
+
+        User.paginate({ name: { $regex: escapedSearchTerm } }, options, function (err, result) {
+            return res.json(
+                {
+                    user: (result.docs),
+                    totalPages: result.totalPages,
+                    page: result.page,
+                    prevPage: result.prevPage,
+                    nextPage: result.nextPage,
+                    totalDocs: result.totalDocs,
+                    search: formData
                 })
-                .catch(next)
-        } else {
 
-            User.paginate({ name: { $regex: escapedSearchTerm } }, options, function (err, result) {
+        });
 
-                if (result.totalPages < result.page) {
-                    const options1 = {
-                        page: result.totalPages,
-                        limit: 5,
-
-                        // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
-                        collation: {
-                            locale: 'en',
-                        },
-                    };
-                    User.paginate({ name: { $regex: escapedSearchTerm } }, options1, function (err, data) {
-
-
-                        return res.json(
-                            {
-                                movie: (data.docs),
-                                totalPages: data.totalPages,
-                                page: result.totalPages,
-                                prevPage: data.prevPage,
-                                nextPage: data.nextPage,
-                                totalDocs: data.totalDocs,
-                                search: formData
-                            })
-
-                    })
-
-                } else {
-
-                    return res.json(
-                        {
-                            movie: (result.docs),
-                            totalPages: result.totalPages,
-                            page: result.page,
-                            prevPage: result.prevPage,
-                            nextPage: result.nextPage,
-                            totalDocs: result.totalDocs,
-                            search: formData
-                        })
-                }
-            });
-        }
 
 
     }
