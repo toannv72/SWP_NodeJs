@@ -45,6 +45,7 @@ class RegController {
                             error: `Tên tài khoản đã tồn tại vui lòng tạo tài khoản khác!`
                         })
                 }
+            
                  // mã hóa password
             var salt = bcrypt.genSaltSync(10);
             var hash = bcrypt.hashSync(formData.password, salt);
