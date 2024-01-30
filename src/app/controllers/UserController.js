@@ -4,15 +4,21 @@ var bcrypt = require('bcryptjs');
 var jwt = require('jsonwebtoken');
 class UserController {
     put(req, res, next) {
-        console.log(req.body);
         User.findByIdAndUpdate(req.params.id,
             req.body)
-            .then((product => {
-                if (!product) {
+            .then((user => {
+                if (!user) {
                     return res.status(404).send({ error: 'User not found' })
-
                 }
-                res.json(product)
+                User.findById(req.params.id)
+                    .then((data) => {
+                        return res.json({_doc: data})
+                    })
+                    .catch(next =>
+                        res.json(next)
+                    )
+
+
             }
             ))
             .catch(next =>
