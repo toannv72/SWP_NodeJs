@@ -151,7 +151,7 @@ class ProductControllers {
             },
             sort: sorts,
         };
-        const query = { quantity: { $gt: 0 }, reducedPrice: { $gte: minPrice, $lte: maxPrice } };
+        const query = { quantity: { $gt: 0 }, price: { $gte: minPrice, $lte: maxPrice } };
         Product.paginate(query, options, function (err, result) {
             return res.json(result)
         })
@@ -202,7 +202,7 @@ class ProductControllers {
         const maxPrice = parseInt(req.query.maxPrice) || 10000000000;
         var sorts = { sold: sort }
         if (sortPrice) {
-            sorts = { reducedPrice: sortPrice }
+            sorts = { price: sortPrice }
         }
         const options = {
             page: page,
@@ -213,7 +213,7 @@ class ProductControllers {
             },
             sort: sorts,
         };
-        const query = { quantity: { $gt: 0 }, reducedPrice: { $gte: minPrice, $lte: maxPrice } };
+        const query = { quantity: { $gt: 0 }, price: { $gte: minPrice, $lte: maxPrice } };
         Product.paginate(query, options, function (err, result) {
             return res.json(result)
         })

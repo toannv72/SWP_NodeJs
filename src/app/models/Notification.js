@@ -33,7 +33,6 @@ const notificationSchema = new mongoose.Schema({
     },
   });
 
-
 notificationSchema .plugin(mongooseDelete, { deletedAt: true, overrideMethods: 'all' });
 notificationSchema .plugin(mongoosePaginate);
 module.exports = mongoose.model('Notification', notificationSchema );
