@@ -28,7 +28,6 @@ class UserController {
     followUser(req, res, next) {
         try {
             // Tìm tài liệu artwork cần thêm like
-
             User.findById(req.params.id)
                 .then((follow) => {
                     const existingLikeIndex = follow.follow.findIndex(follows => follows.user.toString() === req.params.userId);
@@ -78,6 +77,7 @@ class UserController {
             console.error('follow failed:', error);
         }
     }
+    
     trash(req, res, next) {
         User.findDeleted()
             .then(courses =>

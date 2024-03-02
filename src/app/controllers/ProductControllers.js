@@ -136,8 +136,10 @@ class ProductControllers {
         const limit = parseInt(req.query.limit) || 10000000000;
         const sort = parseInt(req.query.sort) || -1;
         const sortPrice = parseInt(req.query.sortPrice)
+        const sortCate = req.query.sortCate;
         const minPrice = parseInt(req.query.minPrice) || 0;
         const maxPrice = parseInt(req.query.maxPrice) || 10000000000;
+        const categoryValue = "Trang trí";
         var sorts = { createdAt: sort }
         if (sortPrice) {
             sorts = { reducedPrice: sortPrice }
@@ -151,7 +153,16 @@ class ProductControllers {
             },
             sort: sorts,
         };
-        const query = { quantity: { $gt: 0 }, price: { $gte: minPrice, $lte: maxPrice } };
+        const query = {
+          quantity: { $gt: 0 },
+          price: { $gte: minPrice, $lte: maxPrice },
+        };
+
+        if (sortCate !== "all") {
+          query.genre = {
+            $in: Array.isArray(sortCate) ? sortCate : [sortCate],
+          };
+        } 
         Product.paginate(query, options, function (err, result) {
             return res.json(result)
         })

@@ -25,6 +25,7 @@ routerArtwork.get('/sold', ProductControllers.showSold)
 
 routerArtwork.get('/random', ProductControllers.showRandom)
 routerArtwork.get('/follow/:id', ProductControllers.showFollow)
+routerArtwork.get("/userFollow/:id", ProductControllers.showUserFollow);
 routerArtwork.get('/:id', ProductControllers.get)
 // lấy theo user
 routerArtwork.get('/user/:id/', ProductControllers.getArtworkUser)
