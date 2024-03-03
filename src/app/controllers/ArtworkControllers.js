@@ -265,6 +265,7 @@ class ProductControllers {
     const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
     const limit = parseInt(req.query.limit) || 10000000000;
     const sort = parseInt(req.query.sort) || -1;
+    const cate = req.query.cate || "all";
     var sorts = { createdAt: sort };
 
     const options = {
@@ -276,7 +277,13 @@ class ProductControllers {
       },
       sort: sorts,
     };
-    Artwork.paginate({}, options, function (err, result) {
+    const query = {};
+        if (cate !== "all") {
+          query.genre = {
+            $in: Array.isArray(cate) ? cate : [cate],
+          };
+        } 
+    Artwork.paginate(query, options, function (err, result) {
       return res.json(result);
     });
   }

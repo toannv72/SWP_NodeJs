@@ -10,8 +10,8 @@ routerCustomOrder
     .route("/user/deposit")
     .get(CustomOrderController.getUserDeposit)
 routerCustomOrder
-    .route("/user/processing")
-    .get(CustomOrderController.getUserProcessing)
+  .route("/user/processing")
+  .get(CustomOrderController.getUserProcessing)
 routerCustomOrder
     .route("/user/shipped")
     .get(CustomOrderController.getUserShipped)
@@ -70,7 +70,9 @@ routerCustomOrder
     .get(CustomOrderController.getUser)
     .post(CustomOrderController.post)
 
-
+routerCustomOrder
+  .route("/user/processing/:id")
+  .put(CustomOrderController.updateStatusOrder);
 // routerCustomOrder
 //     .route("/:id")
 //     .get(authenticatedStaff, CustomOrderController.getOne)
