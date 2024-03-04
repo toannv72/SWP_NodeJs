@@ -145,11 +145,22 @@ class CustomOrderController {
         req.cookies.accessToken,
         Token.refreshToken
       );
-      CustomOrder.find({
-        user: checkTokenValid.user._id,
-        status: "Processing",
-      }).then((CustomOrder) => {
-        res.json({ docs: CustomOrder });
+
+      Promise.all([
+        CustomOrder.find({
+          user: checkTokenValid.user._id,
+          status: "Processing",
+        }),
+        CustomOrder.find({
+          freelancer: checkTokenValid.user._id,
+          status: "Processing",
+        }),
+      ]).then((results) => {
+        const [userOrders, freelancerOrders] = results;
+        res.json({
+          userOrders: userOrders,
+          freelancerOrders: freelancerOrders,
+        });
       });
     } catch (error) {
       console.error(error);
@@ -190,11 +201,22 @@ class CustomOrderController {
         req.cookies.accessToken,
         Token.refreshToken
       );
-      CustomOrder.paginate(
-        { user: checkTokenValid.user._id, status: "Shipped" },
-        options
-      ).then((CustomOrder) => {
-        res.json(CustomOrder);
+
+      Promise.all([
+        CustomOrder.find({
+          user: checkTokenValid.user._id,
+          status: "Shipped",
+        }),
+        CustomOrder.find({
+          freelancer: checkTokenValid.user._id,
+          status: "Shipped",
+        }),
+      ]).then((results) => {
+        const [userOrders, freelancerOrders] = results;
+        res.json({
+          userOrders: userOrders,
+          freelancerOrders: freelancerOrders,
+        });
       });
     } catch (error) {
       console.error(error);
@@ -218,11 +240,22 @@ class CustomOrderController {
         req.cookies.accessToken,
         Token.refreshToken
       );
-      CustomOrder.paginate(
-        { user: checkTokenValid.user._id, status: "Delivered" },
-        options
-      ).then((CustomOrder) => {
-        res.json(CustomOrder);
+
+      Promise.all([
+        CustomOrder.find({
+          user: checkTokenValid.user._id,
+          status: "Delivered",
+        }),
+        CustomOrder.find({
+          freelancer: checkTokenValid.user._id,
+          status: "Delivered",
+        }),
+      ]).then((results) => {
+        const [userOrders, freelancerOrders] = results;
+        res.json({
+          userOrders: userOrders,
+          freelancerOrders: freelancerOrders,
+        });
       });
     } catch (error) {
       console.error(error);
@@ -246,11 +279,22 @@ class CustomOrderController {
         req.cookies.accessToken,
         Token.refreshToken
       );
-      CustomOrder.paginate(
-        { user: checkTokenValid.user._id, status: "Canceled" },
-        options
-      ).then((CustomOrder) => {
-        res.json(CustomOrder);
+
+      Promise.all([
+        CustomOrder.find({
+          user: checkTokenValid.user._id,
+          status: "Canceled",
+        }),
+        CustomOrder.find({
+          freelancer: checkTokenValid.user._id,
+          status: "Canceled",
+        }),
+      ]).then((results) => {
+        const [userOrders, freelancerOrders] = results;
+        res.json({
+          userOrders: userOrders,
+          freelancerOrders: freelancerOrders,
+        });
       });
     } catch (error) {
       console.error(error);
