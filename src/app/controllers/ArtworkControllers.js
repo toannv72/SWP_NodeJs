@@ -1,6 +1,8 @@
 const { addLeadingZeros } = require('../../util/UtilsFuntion');
 const Artwork = require('../models/Artwork');
 const User = require('../models/User');
+const Token = require("../../config/db/config");
+var jwt = require("jsonwebtoken");
 class ProductControllers {
   put(req, res, next) {
     Artwork.findByIdAndUpdate(req.params.id, req.body, { new: true })
@@ -172,6 +174,13 @@ class ProductControllers {
   }
   unlikeArtwork(req, res, next) {
     try {
+            var checkTokenValid = jwt.verify(
+              req.cookies.accessToken,
+              Token.refreshToken
+            );
+            if (checkTokenValid.user.hidden) {
+              return res.status(500).json({ error: "bạn đang bị chặn!" });
+            }
       // Tìm tài liệu artwork cần hủy like
       Artwork.findById(req.params.artworkId)
         .then((artwork) => {
@@ -197,7 +206,13 @@ class ProductControllers {
   likeArtwork(req, res, next) {
     try {
       // Tìm tài liệu artwork cần thêm like
-
+      var checkTokenValid = jwt.verify(
+        req.cookies.accessToken,
+        Token.refreshToken
+      );
+      if (checkTokenValid.user.hidden) {
+        return res.status(500).json({ error: "bạn đang bị chặn!" });
+      }
       Artwork.findById(req.params.artworkId)
         .then((artwork) => {
           const existingLikeIndex = artwork.likes.findIndex(
@@ -223,6 +238,13 @@ class ProductControllers {
   }
   cmtArtwork(req, res, next) {
     try {
+                  var checkTokenValid = jwt.verify(
+                    req.cookies.accessToken,
+                    Token.refreshToken
+                  );
+                  if (checkTokenValid.user.hidden) {
+                    return res.status(500).json({ error: "bạn đang bị chặn!" });
+                  }
       // Tìm tài liệu artwork cần thêm like
       Artwork.findById(req.params.artworkId)
         .then((artwork) => {
@@ -251,11 +273,20 @@ class ProductControllers {
   post(req, res, next) {
     const formData = req.body;
     const course = new Artwork(formData);
+      var checkTokenValid = jwt.verify(
+        req.cookies.accessToken,
+        Token.refreshToken
+      );
+    if (checkTokenValid.user.hidden) {
+      return res.status(500).json({ error: "bạn đang bị chặn!" });
+    }
     course
       .save()
       .then(() => res.json(req.body))
       .catch((error) => {
-        res.json(error);
+        res
+          .status(500)
+          .json({ error: "Hiện đang gặp phải vấn đề vui lòng thử lại sau!" });
       });
 
     // res.send(`oke`)

@@ -49,8 +49,9 @@ io.on('connection', (socket) => {
         // Gửi thông báo cho tất cả các client kết nối
         io.emit('notification', data);
     });
-
-
+    socket.on('push_block', (data) => {
+        io.emit("block", data);
+    });
     socket.on('disconnect', () => {
         console.log('A client disconnected');
     });
