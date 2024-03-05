@@ -46,13 +46,21 @@ class CustomOrderController {
         req.cookies.accessToken,
         Token.refreshToken
       );
-      CustomOrder.paginate(
-        { user: checkTokenValid.user._id },
-        options,
-        function (err, result) {
-          return res.json(result);
-        }
-      );
+     
+      Promise.all([
+        CustomOrder.find({
+          user: checkTokenValid.user._id,
+        }),
+        CustomOrder.find({
+          freelancer: checkTokenValid.user._id,
+        }),
+      ]).then((results) => {
+        const [userOrders, freelancerOrders] = results;
+        res.json({
+          userOrders: userOrders,
+          freelancerOrders: freelancerOrders,
+        });
+      });
       // Trả về thông tin đơn hàng
     } catch (error) {
       console.error(error);
@@ -608,9 +616,10 @@ class CustomOrderController {
           }
           //  Kiểm tra xem người dùng có quyền truy cập đơn hàng không
           if (
-            checkTokenValid.user._id.toString() ===
-              CustomOrder.user.toString() ||
-            checkTokenValid.user.admin
+            true
+            // checkTokenValid.user._id.toString() ===
+            //   CustomOrder.user.toString() ||
+            // checkTokenValid.user.admin
           ) {
             return res.json(CustomOrder);
           }
