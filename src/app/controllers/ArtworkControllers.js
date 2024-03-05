@@ -1,6 +1,6 @@
-const { addLeadingZeros } = require('../../util/UtilsFuntion');
-const Artwork = require('../models/Artwork');
-const User = require('../models/User');
+const { addLeadingZeros } = require("../../util/UtilsFuntion");
+const Artwork = require("../models/Artwork");
+const User = require("../models/User");
 const Token = require("../../config/db/config");
 var jwt = require("jsonwebtoken");
 class ProductControllers {
@@ -174,31 +174,34 @@ class ProductControllers {
   }
   unlikeArtwork(req, res, next) {
     try {
-            var checkTokenValid = jwt.verify(
-              req.cookies.accessToken,
-              Token.refreshToken
-            );
-            if (checkTokenValid.user.hidden) {
-              return res.status(500).json({ error: "bạn đang bị chặn!" });
-            }
-      // Tìm tài liệu artwork cần hủy like
-      Artwork.findById(req.params.artworkId)
+      var checkTokenValid = jwt.verify(
+        req.cookies.accessToken,
+        Token.refreshToken
+      );
+      User.findById(checkTokenValid.user._id)
         .then((artwork) => {
-          if (!artwork) {
-            return res.status(404).json({ message: "Artwork not found" });
+          if (artwork.hidden) {
+            return res.status(500).json({ error: "bạn đang bị chặn!" });
           }
-          const existingLikeIndex = artwork.likes.findIndex(
-            (like) => like.user.toString() === req.params.userId
-          );
-          // Thêm like mới vào mảng likes
-          artwork.likes.splice(existingLikeIndex, 1);
-          // Lưu cập nhật
-          artwork.save();
-          return res.json(artwork);
+          Artwork.findById(req.params.artworkId)
+            .then((artwork) => {
+              if (!artwork) {
+                return res.status(404).json({ message: "Artwork not found" });
+              }
+              const existingLikeIndex = artwork.likes.findIndex(
+                (like) => like.user.toString() === req.params.userId
+              );
+              // Thêm like mới vào mảng likes
+              artwork.likes.splice(existingLikeIndex, 1);
+              // Lưu cập nhật
+              artwork.save();
+              return res.json(artwork);
+            })
+            .catch((error) => {
+              return res.json(error);
+            });
         })
-        .catch((error) => {
-          return res.json(error);
-        });
+        .catch((error) => {});
     } catch (error) {
       console.error("Unlike failed:", error.message);
     }
@@ -210,26 +213,30 @@ class ProductControllers {
         req.cookies.accessToken,
         Token.refreshToken
       );
-      if (checkTokenValid.user.hidden) {
-        return res.status(500).json({ error: "bạn đang bị chặn!" });
-      }
-      Artwork.findById(req.params.artworkId)
+      User.findById(checkTokenValid.user._id)
         .then((artwork) => {
-          const existingLikeIndex = artwork.likes.findIndex(
-            (like) => like.user.toString() === req.params.userId
-          );
-          if (existingLikeIndex !== -1) {
-            throw new Error("User already liked this artwork");
+          if (artwork.hidden) {
+            return res.status(500).json({ error: "bạn đang bị chặn!" });
           }
-          // Thêm like mới vào mảng likes
-          artwork.likes.push({ user: req.params.userId });
-          // Lưu cập nhật
-          artwork.save();
-          return res.json(artwork);
+          Artwork.findById(req.params.artworkId)
+            .then((artwork) => {
+              const existingLikeIndex = artwork.likes.findIndex(
+                (like) => like.user.toString() === req.params.userId
+              );
+              if (existingLikeIndex !== -1) {
+                throw new Error("User already liked this artwork");
+              }
+              // Thêm like mới vào mảng likes
+              artwork.likes.push({ user: req.params.userId });
+              // Lưu cập nhật
+              artwork.save();
+              return res.json(artwork);
+            })
+            .catch((error) => {
+              return res.json(error);
+            });
         })
-        .catch((error) => {
-          return res.json(error);
-        });
+        .catch((error) => {});
 
       // Kiểm tra xem người dùng đã like trước đó hay chưa
     } catch (error) {
@@ -238,32 +245,36 @@ class ProductControllers {
   }
   cmtArtwork(req, res, next) {
     try {
-                  var checkTokenValid = jwt.verify(
-                    req.cookies.accessToken,
-                    Token.refreshToken
-                  );
-                  if (checkTokenValid.user.hidden) {
-                    return res.status(500).json({ error: "bạn đang bị chặn!" });
-                  }
-      // Tìm tài liệu artwork cần thêm like
-      Artwork.findById(req.params.artworkId)
+      var checkTokenValid = jwt.verify(
+        req.cookies.accessToken,
+        Token.refreshToken
+      );
+      User.findById(checkTokenValid.user._id)
         .then((artwork) => {
-          // const existingLikeIndex = artwork.comments.findIndex(like => like.user.toString() === req.params.userId);
-          // if (existingLikeIndex !== -1) {
-          //     throw new Error('User already liked this artwork');
-          // }
-          // Thêm like mới vào mảng comments
-          artwork.comments.push({
-            user: req.params.userId,
-            content: req.body.content,
-          });
-          // Lưu cập nhật
-          artwork.save();
-          return res.json(artwork);
+          if (artwork.hidden) {
+            return res.status(500).json({ error: "bạn đang bị chặn!" });
+          }
+          Artwork.findById(req.params.artworkId)
+            .then((artwork) => {
+              // const existingLikeIndex = artwork.comments.findIndex(like => like.user.toString() === req.params.userId);
+              // if (existingLikeIndex !== -1) {
+              //     throw new Error('User already liked this artwork');
+              // }
+              // Thêm like mới vào mảng comments
+              artwork.comments.push({
+                user: req.params.userId,
+                content: req.body.content,
+              });
+              // Lưu cập nhật
+              artwork.save();
+              return res.json(artwork);
+            })
+            .catch((error) => {
+              return res.json(error);
+            });
         })
-        .catch((error) => {
-          return res.json(error);
-        });
+        .catch((error) => {});
+      // Tìm tài liệu artwork cần thêm like
 
       // Kiểm tra xem người dùng đã like trước đó hay chưa
     } catch (error) {
@@ -273,13 +284,15 @@ class ProductControllers {
   post(req, res, next) {
     const formData = req.body;
     const course = new Artwork(formData);
-      var checkTokenValid = jwt.verify(
-        req.cookies.accessToken,
-        Token.refreshToken
-      );
-    if (checkTokenValid.user.hidden) {
-      return res.status(500).json({ error: "bạn đang bị chặn!" });
-    }
+    var checkTokenValid = jwt.verify(
+      req.cookies.accessToken,
+      Token.refreshToken
+    );
+          User.findById(checkTokenValid.user._id)
+            .then((artwork) => {
+              if (artwork.hidden) {
+                return res.status(500).json({ error: "bạn đang bị chặn!" });
+              }
     course
       .save()
       .then(() => res.json(req.body))
@@ -288,6 +301,8 @@ class ProductControllers {
           .status(500)
           .json({ error: "Hiện đang gặp phải vấn đề vui lòng thử lại sau!" });
       });
+            })
+            .catch((error) => {});
 
     // res.send(`oke`)
   }
@@ -309,11 +324,11 @@ class ProductControllers {
       sort: sorts,
     };
     const query = {};
-        if (cate !== "all") {
-          query.genre = {
-            $in: Array.isArray(cate) ? cate : [cate],
-          };
-        } 
+    if (cate !== "all") {
+      query.genre = {
+        $in: Array.isArray(cate) ? cate : [cate],
+      };
+    }
     Artwork.paginate(query, options, function (err, result) {
       return res.json(result);
     });
@@ -370,17 +385,13 @@ class ProductControllers {
         },
         sort: { createdAt: parseInt(req.query.sort) || -1 },
       };
-             User.paginate(
-               { _id: { $in: followedUsers } },
-               options,
-               (err, result) => {
-                 if (err) {
-                   return res.status(500).json({ error: err.message });
-                 }
+      User.paginate({ _id: { $in: followedUsers } }, options, (err, result) => {
+        if (err) {
+          return res.status(500).json({ error: err.message });
+        }
 
-                 return res.json(result);
-               }
-             );
+        return res.json(result);
+      });
     });
   }
   showRandom(req, res, next) {
@@ -566,4 +577,4 @@ class ProductControllers {
     return res.status(200).json({ unhide: true });
   };
 }
-module.exports = new ProductControllers;
+module.exports = new ProductControllers();
