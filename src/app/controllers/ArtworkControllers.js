@@ -133,31 +133,31 @@ class ProductControllers {
         { genre: { $regex: regex } },
         options,
         function (err, result) {
-          if (result.totalPages < result.page) {
-            const options1 = {
-              page: result.totalPages,
-              limit: 9,
-              // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
-              collation: {
-                locale: "en",
-              },
-            };
-            Artwork.paginate(
-              { genre: { $regex: escapedSearchTerm } },
-              options1,
-              function (err, data) {
-                return res.json({
-                  products: data.docs,
-                  totalPages: data.totalPages,
-                  page: result.totalPages,
-                  prevPage: data.prevPage,
-                  nextPage: data.nextPage,
-                  totalDocs: data.totalDocs,
-                  search: formData,
-                });
-              }
-            );
-          } else {
+          // if (result.totalPages < result.page) {
+          //   const options1 = {
+          //     page: result.totalPages,
+          //     limit: 9,
+          //     // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
+          //     collation: {
+          //       locale: "en",
+          //     },
+          //   };
+          //   Artwork.paginate(
+          //     { genre: { $regex: escapedSearchTerm } },
+          //     options1,
+          //     function (err, data) {
+          //       return res.json({
+          //         products: data.docs,
+          //         totalPages: data.totalPages,
+          //         page: result.totalPages,
+          //         prevPage: data.prevPage,
+          //         nextPage: data.nextPage,
+          //         totalDocs: data.totalDocs,
+          //         search: formData,
+          //       });
+          //     }
+          //   );
+          // } else {
             return res.json({
               products: result.docs,
               totalPages: result.totalPages,
@@ -168,7 +168,7 @@ class ProductControllers {
               search: formData,
             });
           }
-        }
+        // }
       );
     }
   }
