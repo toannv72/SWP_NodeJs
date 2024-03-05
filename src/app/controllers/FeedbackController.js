@@ -14,13 +14,17 @@ class FeedbackController {
         const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
         const limit = parseInt(req.query.limit) || 100; // Số lượng phần tử trên mỗi trang, mặc định là 100
         const options = {
-            page: page,
-            limit: limit,
-            // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
-            collation: {
-                locale: 'en',
-            },
-            populate: [{ path: 'user', select: 'username email' }, { path: 'artwork' }, {path: "accuse"}]
+          page: page,
+          limit: limit,
+          // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
+          collation: {
+            locale: "en",
+          },
+          populate: [
+            { path: "user", select: "username email hidden" },
+            { path: "artwork", select: "hidden" },
+            { path: "accuse", select: "username email hidden" },
+          ],
         };
         Feedback.paginate({}, options, function (err, result) {
             if (err) {
@@ -128,17 +132,49 @@ class FeedbackController {
 
     // }
     hide= async (req, res, next)=> {
-        await Feedback.findByIdAndUpdate({_id: req.params.id}, {hidden: true})
-        await Artwork.findByIdAndUpdate({_id: req.body.artwork}, {hidden: true})
-        await User.findByIdAndUpdate({_id: req.body.artwork}, {hidden: true})
+        if (req.body.artwork) {
+                    // await Feedback.findByIdAndUpdate(
+                    //   { artwork: req.body.artwork },
+                    //   { hidden: true }
+                    // );
+                    await Artwork.findByIdAndUpdate(
+                      { _id: req.body.artwork },
+                      { hidden: true }
+                    );
+        } else {
+                    // await Feedback.findByIdAndUpdate(
+                    //   { accuse: req.body.accuse },
+                    //   { hidden: true }
+                    // );
+                    await User.findByIdAndUpdate(
+                      { _id: req.body.accuse },
+                      { hidden: true }
+                    );
+        }
         return res.status(200).json({hide: true})
     }
 
     unhide= async (req, res, next)=> {
-        await Feedback.findByIdAndUpdate({_id: req.params.id}, {hidden: false})
-        await Artwork.findByIdAndUpdate({_id: req.body.artwork}, {hidden: false})
-        await User.findByIdAndUpdate({_id: req.body.artwork}, {hidden: false})
-        return res.status(200).json({unhide: true})
+              if (req.body?.artwork) {
+                // await Feedback.findByIdAndUpdate(
+                //   { artwork: req.body.artwork },
+                //   { hidden: true }
+                // );
+                await Artwork.findByIdAndUpdate(
+                  { _id: req.body.artwork },
+                  { hidden: false }
+                );
+              } else {
+                // await Feedback.findByIdAndUpdate(
+                //   { accuse: req.body.accuse },
+                //   { hidden: true }
+                // );
+                await User.findByIdAndUpdate(
+                  { _id: req.body.accuse },
+                  { hidden: false }
+                );
+              }
+              return res.status(200).json({ unhide: true });
     }
 
 }

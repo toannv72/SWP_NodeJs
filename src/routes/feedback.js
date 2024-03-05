@@ -25,10 +25,10 @@ routerFeedback
     .post(FeedbackController.post)
 
 routerFeedback
-    .route("/hide/:id")
+    .route("/hide")
     .post(FeedbackController.hide)
 
 routerFeedback
-    .route("/unhide/:id")
+    .route("/unhide")
     .post(FeedbackController.unhide)
 module.exports = routerFeedback

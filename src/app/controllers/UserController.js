@@ -245,13 +245,22 @@ class UserController {
                     res.status(500).json({ error: 'Không thể xóa tài khoản này' })
                 } else {
                     console.log(req.params.id)
-                    User.findOneAndUpdate({ _id: req.params.id }, {deleted: false}, {new: true, upsert: true})
-                        .then((User => {
-                            console.log(User)
-                            console.log(11111222)
-                            res.send(User)
-                        }))
-                        .catch(error => res.status(500).json({ error: 'Could not retrieve User.' }))
+                    User.findOneAndUpdate(
+                      { _id: req.params.id },
+                      { deleted: false },
+                      { hidden: false },
+                      { new: true, upsert: true }
+                    )
+                      .then((User) => {
+                        console.log(User);
+                        console.log(11111222);
+                        res.send(User);
+                      })
+                      .catch((error) =>
+                        res
+                          .status(500)
+                          .json({ error: "Could not retrieve User." })
+                      );
                 }
             }))
             .catch(err => res.status(err))
@@ -265,11 +274,19 @@ class UserController {
                 if (data.role === 'admin') {
                     res.status(500).json({ error: 'Không thể xóa tài khoản này' })
                 } else {
-                    User.findOneAndUpdate({ _id: req.params.id }, {deleted: true})
-                        .then((User => {
-                            res.send(User)
-                        }))
-                        .catch(error => res.status(500).json({ error: 'Could not retrieve User.' }))
+                    User.findOneAndUpdate(
+                      { _id: req.params.id },
+                      { deleted: true },
+                      { hidden: true }
+                    )
+                      .then((User) => {
+                        res.send(User);
+                      })
+                      .catch((error) =>
+                        res
+                          .status(500)
+                          .json({ error: "Could not retrieve User." })
+                      );
                 }
             }))
             .catch(err => res.status(err))
