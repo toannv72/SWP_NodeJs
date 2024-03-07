@@ -142,7 +142,7 @@ class ProductControllers {
         const categoryValue = "Trang trí";
         var sorts = { createdAt: sort }
         if (sortPrice) {
-            sorts = { reducedPrice: sortPrice }
+            sorts = { price: sortPrice }
         }
         const options = {
             page: page,
