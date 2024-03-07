@@ -12,7 +12,7 @@ class UserController {
                 }
                 User.findById(req.params.id)
                     .then((data) => {
-                        return res.json({_doc: data})
+                        return res.json({ _doc: data })
                     })
                     .catch(next =>
                         res.json(next)
@@ -77,7 +77,7 @@ class UserController {
             console.error('follow failed:', error);
         }
     }
-    
+
     trash(req, res, next) {
         User.findDeleted()
             .then(courses =>
@@ -183,7 +183,7 @@ class UserController {
         };
 
 
-        User.paginate({ name: { $regex: escapedSearchTerm } }, options, function (err, result) {
+        User.paginate({ name: { $regex: escapedSearchTerm }, hidden: false }, options, function (err, result) {
             return res.json(
                 {
                     user: (result.docs),
@@ -236,7 +236,7 @@ class UserController {
             .catch(err => res.status(err))
     }
 
-    
+
     unblock(req, res, next) {
         User.findById(req.params.id)
             .then((data => {
@@ -246,21 +246,21 @@ class UserController {
                 } else {
                     console.log(req.params.id)
                     User.findOneAndUpdate(
-                      { _id: req.params.id },
-                      { deleted: false },
-                      { hidden: false },
-                      { new: true, upsert: true }
+                        { _id: req.params.id },
+                        { deleted: false },
+                        { hidden: false },
+                        { new: true, upsert: true }
                     )
-                      .then((User) => {
-                        console.log(User);
-                        console.log(11111222);
-                        res.send(User);
-                      })
-                      .catch((error) =>
-                        res
-                          .status(500)
-                          .json({ error: "Could not retrieve User." })
-                      );
+                        .then((User) => {
+                            console.log(User);
+                            console.log(11111222);
+                            res.send(User);
+                        })
+                        .catch((error) =>
+                            res
+                                .status(500)
+                                .json({ error: "Could not retrieve User." })
+                        );
                 }
             }))
             .catch(err => res.status(err))
@@ -275,18 +275,18 @@ class UserController {
                     res.status(500).json({ error: 'Không thể xóa tài khoản này' })
                 } else {
                     User.findOneAndUpdate(
-                      { _id: req.params.id },
-                      { deleted: true },
-                      { hidden: true }
+                        { _id: req.params.id },
+                        { deleted: true },
+                        { hidden: true }
                     )
-                      .then((User) => {
-                        res.send(User);
-                      })
-                      .catch((error) =>
-                        res
-                          .status(500)
-                          .json({ error: "Could not retrieve User." })
-                      );
+                        .then((User) => {
+                            res.send(User);
+                        })
+                        .catch((error) =>
+                            res
+                                .status(500)
+                                .json({ error: "Could not retrieve User." })
+                        );
                 }
             }))
             .catch(err => res.status(err))

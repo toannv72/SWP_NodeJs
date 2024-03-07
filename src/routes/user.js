@@ -24,7 +24,7 @@ routerUser
 
 routerUser
     .route("/search")
-    .get( UserController.search)
+    .get(UserController.search)
 
 routerUser.put('/restore/:id',
     authenticatedAdmin, UserController.restore)
