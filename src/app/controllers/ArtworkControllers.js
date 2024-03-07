@@ -158,16 +158,16 @@ class ProductControllers {
           //     }
           //   );
           // } else {
-            return res.json({
-              products: result.docs,
-              totalPages: result.totalPages,
-              page: result.page,
-              prevPage: result.prevPage,
-              nextPage: result.nextPage,
-              totalDocs: result.totalDocs,
-              search: formData,
-            });
-          }
+          return res.json({
+            products: result.docs,
+            totalPages: result.totalPages,
+            page: result.page,
+            prevPage: result.prevPage,
+            nextPage: result.nextPage,
+            totalDocs: result.totalDocs,
+            search: formData,
+          });
+        }
         // }
       );
     }
@@ -288,26 +288,26 @@ class ProductControllers {
       req.cookies.accessToken,
       Token.refreshToken
     );
-          User.findById(checkTokenValid.user._id)
-            .then((artwork) => {
-              if (artwork.hidden) {
-                return res.status(500).json({ error: "bạn đang bị chặn!" });
-              }
-    course
-      .save()
-      .then(() => res.json(req.body))
-      .catch((error) => {
-        res
-          .status(500)
-          .json({ error: "Hiện đang gặp phải vấn đề vui lòng thử lại sau!" });
-      });
-            })
-            .catch((error) => {});
+    User.findById(checkTokenValid.user._id)
+      .then((artwork) => {
+        if (artwork.hidden) {
+          return res.status(500).json({ error: "bạn đang bị chặn!" });
+        }
+        course
+          .save()
+          .then(() => res.json(req.body))
+          .catch((error) => {
+            res.status(500).json({
+              error: "Hiện đang gặp phải vấn đề vui lòng thử lại sau!",
+            });
+          });
+      })
+      .catch((error) => {});
 
     // res.send(`oke`)
   }
 
-  show(req, res, next) {
+  async show(req, res, next) {
     const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
     const limit = parseInt(req.query.limit) || 10000000000;
     const sort = parseInt(req.query.sort) || -1;
@@ -323,7 +323,10 @@ class ProductControllers {
       },
       sort: sorts,
     };
+    const nonHiddenUsers = await User.find({ hidden: false });
+    const userIds = nonHiddenUsers.map((user) => user._id);
     const query = {};
+    query.user = { $in: userIds };
     if (cate !== "all") {
       query.genre = {
         $in: Array.isArray(cate) ? cate : [cate],
@@ -335,38 +338,51 @@ class ProductControllers {
   }
   showFollow(req, res, next) {
     const userId = req.params.id; // Lấy _id của người dùng từ request, bạn cần đảm bảo rằng đã xác thực người dùng và có thông tin người dùng trong request
-
     // Bước 1: Tìm người dùng dựa trên _id
-    User.findById(userId).then((user) => {
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
-      // Bước 2: Lấy danh sách các người dùng mà người dùng đã follow
-      const followedUsers = user.followAdd.map((follow) => follow.user);
-
-      // Bước 3: Sử dụng danh sách đã follow để tìm các bài viết
-      const options = {
-        page: parseInt(req.query.page) || 1,
-        limit: parseInt(req.query.limit) || 10000000000,
-        collation: {
-          locale: "en",
-        },
-        sort: { createdAt: parseInt(req.query.sort) || -1 },
-      };
-
-      Artwork.paginate(
-        { user: { $in: followedUsers } },
-        options,
-        (err, result) => {
-          if (err) {
-            return res.status(500).json({ error: err.message });
-          }
-
-          return res.json(result);
+    User.findById(userId)
+      .then((user) => {
+        if (!user) {
+          return res.status(404).json({ error: "User not found" });
         }
-      );
-    });
+        // Bước 2: Lấy danh sách các người dùng mà người dùng đã follow
+        const followedUsers = user.followAdd.map((follow) => follow.user);
+
+        // Bước 3: Sử dụng danh sách đã follow để tìm các bài viết từ những người dùng không ẩn
+        const options = {
+          page: parseInt(req.query.page) || 1,
+          limit: parseInt(req.query.limit) || 10000000000,
+          collation: {
+            locale: "en",
+          },
+          sort: { createdAt: parseInt(req.query.sort) || -1 },
+        };
+
+        // Lọc ra những người dùng không ẩn từ danh sách đã follow
+        User.find({ _id: { $in: followedUsers }, hidden: false })
+          .then((nonHiddenFollowAdd) => {
+            const nonHiddenFollowAddIds = nonHiddenFollowAdd.map((u) => u._id);
+
+            // Sử dụng danh sách đã follow và không ẩn để tìm các bài viết
+            Artwork.paginate(
+              { user: { $in: nonHiddenFollowAddIds } },
+              options,
+              (err, result) => {
+                if (err) {
+                  return res.status(500).json({ error: err.message });
+                }
+                return res.json(result);
+              }
+            );
+          })
+          .catch((err) => {
+            return res.status(500).json({ error: err.message });
+          });
+      })
+      .catch((err) => {
+        return res.status(500).json({ error: err.message });
+      });
   }
+
   showUserFollow(req, res, next) {
     const userId = req.params.id; // Lấy _id của người dùng từ request, bạn cần đảm bảo rằng đã xác thực người dùng và có thông tin người dùng trong request
 
@@ -385,13 +401,17 @@ class ProductControllers {
         },
         sort: { createdAt: parseInt(req.query.sort) || -1 },
       };
-      User.paginate({ _id: { $in: followedUsers } }, options, (err, result) => {
-        if (err) {
-          return res.status(500).json({ error: err.message });
-        }
+      User.paginate(
+        { _id: { $in: followedUsers }, hidden: false },
+        options,
+        (err, result) => {
+          if (err) {
+            return res.status(500).json({ error: err.message });
+          }
 
-        return res.json(result);
-      });
+          return res.json(result);
+        }
+      );
     });
   }
   showRandom(req, res, next) {
