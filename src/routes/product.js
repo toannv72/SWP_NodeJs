@@ -10,9 +10,9 @@ routerProduct
 routerProduct.delete('/:id',  ProductControllers.delete)
 
 // khôi phục dữ liệu đã xóa
-routerProduct.put('/restore/:id', authenticatedStaff, ProductControllers.restore)
+routerProduct.put('/restore/:id',  ProductControllers.restore)
 // danh sách đã xóa 
-routerProduct.get('/trash', authenticatedStaff, ProductControllers.trash)
+routerProduct.get('/trash',  ProductControllers.trash)
 routerProduct.get('/search?', ProductControllers.search)
 
 routerProduct.get('/staff', ProductControllers.showProductStaff)
