@@ -1,316 +1,354 @@
-const { addLeadingZeros } = require('../../util/UtilsFuntion');
-const Product = require('../models/Product');
+const { addLeadingZeros } = require("../../util/UtilsFuntion");
+const Product = require("../models/Product");
+const User = require("../models/User");
 class ProductControllers {
+  put(req, res, next) {
+    Product.findByIdAndUpdate(req.params.id, req.body, { new: true })
+      .then((product) => {
+        res.json(product);
+      })
+      .catch((next) => res.json(next));
+  }
 
+  trash(req, res, next) {
+    Product.findDeleted()
+      .then((courses) => res.json(courses))
+      .catch(next);
+  }
 
-    put(req, res, next) {
-
-        Product.findByIdAndUpdate(req.params.id,
-            req.body, { new: true })
-            .then((product => {
-                res.json(product)
-            }
-            ))
-            .catch(next =>
-                res.json(next)
-            )
+  restore(req, res, next) {
+    Product.restore({ _id: req.params.id })
+      .then(() => {
+        Product.findByIdAndUpdate(
+          req.params.id,
+          // req.body
+          {
+            deleted: false,
+          }
+        )
+          .then((e) => res.json(e))
+          .catch(next);
+      })
+      .catch(next);
+  }
+  search(req, res, next) {
+    function escapeRegExp(text) {
+      return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
     }
+    const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
+    const limit = parseInt(req.query.limit) || 9; // Số lượng phần tử trên mỗi trang, mặc định là 10
+    const formData = req.query.name;
+    const escapedSearchTerm = escapeRegExp(formData);
+    const regex = new RegExp(escapedSearchTerm, "i");
+    const options = {
+      page: page,
+      limit: limit,
 
+      // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
+      collation: {
+        locale: "en",
+      },
+    };
+    if (formData === "") {
+      Product.find({})
+        .then((movies) => {
+          res.json({ movie: [movies] });
+        })
+        .catch(next);
+    } else {
+      Product.paginate(
+        { name: { $regex: regex } },
+        options,
+        function (err, result) {
+          if (result.totalPages < result.page) {
+            const options1 = {
+              page: result.totalPages,
+              limit: 9,
 
-    trash(req, res, next) {
-        Product.findDeleted()
-            .then(courses =>
-                res.json(courses))
-            .catch(next)
-
-    }
-
-    restore(req, res, next) {
-        Product.restore({ _id: req.params.id })
-            .then(() => {
-                Product.findByIdAndUpdate(req.params.id,
-                    // req.body
-                    {
-                        "deleted": false
-                    }
-                )
-                    .then((e) => res.json(e))
-                    .catch(next)
-            })
-            .catch(next)
-
-    }
-    search(req, res, next) {
-        function escapeRegExp(text) {
-            return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-        }
-        const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
-        const limit = parseInt(req.query.limit) || 9; // Số lượng phần tử trên mỗi trang, mặc định là 10
-        const formData = req.query.name
-        const escapedSearchTerm = escapeRegExp(formData);
-        const regex = new RegExp(escapedSearchTerm, 'i');
-        const options = {
-            page: page,
-            limit: limit,
-
-            // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
-            collation: {
-                locale: 'en',
-            },
-        };
-        if (formData === "") {
-
-            Product.find({})
-                .then((movies) => {
-                    res.json({ "movie": [movies] })
-                })
-                .catch(next)
-        } else {
-            Product.paginate({ name: { $regex: regex } }, options, function (err, result) {
-
-                if (result.totalPages < result.page) {
-                    const options1 = {
-                        page: result.totalPages,
-                        limit: 9,
-
-                        // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
-                        collation: {
-                            locale: 'en',
-                        },
-                    };
-                    Product.paginate({ name: { $regex: escapedSearchTerm } }, options1, function (err, data) {
-
-
-                        return res.json(
-                            {
-                                products: (data.docs),
-                                totalPages: data.totalPages,
-                                page: result.totalPages,
-                                prevPage: data.prevPage,
-                                nextPage: data.nextPage,
-                                totalDocs: data.totalDocs,
-                                search: formData
-                            })
-
-                    })
-
-                } else {
-
-                    return res.json(
-                        {
-                            products: (result.docs),
-                            totalPages: result.totalPages,
-                            page: result.page,
-                            prevPage: result.prevPage,
-                            nextPage: result.nextPage,
-                            totalDocs: result.totalDocs,
-                            search: formData
-                        })
-                }
+              // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
+              collation: {
+                locale: "en",
+              },
+            };
+            Product.paginate(
+              { name: { $regex: escapedSearchTerm } },
+              options1,
+              function (err, data) {
+                return res.json({
+                  products: data.docs,
+                  totalPages: data.totalPages,
+                  page: result.totalPages,
+                  prevPage: data.prevPage,
+                  nextPage: data.nextPage,
+                  totalDocs: data.totalDocs,
+                  search: formData,
+                });
+              }
+            );
+          } else {
+            return res.json({
+              products: result.docs,
+              totalPages: result.totalPages,
+              page: result.page,
+              prevPage: result.prevPage,
+              nextPage: result.nextPage,
+              totalDocs: result.totalDocs,
+              search: formData,
             });
+          }
         }
-
-
+      );
     }
+  }
 
-    post(req, res, next) {
-        const formData = req.body
-        const materialArray = formData.material
-        const course = new Product(formData)
+  post(req, res, next) {
+    const formData = req.body;
+    const materialArray = formData.material;
+    const course = new Product(formData);
 
-        // here
+    // here
 
-        // here
-        // save thông tin
-        course.save()
-            .then(() => res.json(req.body))
-            .catch((error) => {
-                res.json(error)
-            })
+    // here
+    // save thông tin
+    course
+      .save()
+      .then(() => res.json(req.body))
+      .catch((error) => {
+        res.json(error);
+      });
 
-        // res.send(`oke`)
+    // res.send(`oke`)
+  }
+
+  show(req, res, next) {
+    const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
+    const limit = parseInt(req.query.limit) || 10000000000;
+    const sort = parseInt(req.query.sort) || -1;
+    const sortPrice = parseInt(req.query.sortPrice);
+    const sortCate = req.query.sortCate;
+    const minPrice = parseInt(req.query.minPrice) || 0;
+    const maxPrice = parseInt(req.query.maxPrice) || 10000000000;
+    const categoryValue = "Trang trí";
+    var sorts = { createdAt: sort };
+    if (sortPrice) {
+      sorts = { price: sortPrice };
     }
+    const options = {
+      page: page,
+      limit: limit,
+      // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
+      collation: {
+        locale: "en",
+      },
+      sort: sorts,
+    };
 
-    show(req, res, next) {
-        const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
-        const limit = parseInt(req.query.limit) || 10000000000;
-        const sort = parseInt(req.query.sort) || -1;
-        const sortPrice = parseInt(req.query.sortPrice)
-        const sortCate = req.query.sortCate;
-        const minPrice = parseInt(req.query.minPrice) || 0;
-        const maxPrice = parseInt(req.query.maxPrice) || 10000000000;
-        const categoryValue = "Trang trí";
-        var sorts = { createdAt: sort }
-        if (sortPrice) {
-            sorts = { price: sortPrice }
+    // Tìm các người dùng có hidden là false
+    User.find({ hidden: false }, (err, users) => {
+      if (err) {
+        return res.status(500).json({ message: "Internal Server Error" });
+      }
+
+      // Lấy danh sách id của các người dùng không bị ẩn
+      const userIds = users.map((user) => user._id);
+
+      // Tạo truy vấn để lấy các sản phẩm của các người dùng này
+      const query = {
+        user: { $in: userIds }, // Sản phẩm thuộc các người dùng trong danh sách userIds
+        quantity: { $gt: 0 },
+        price: { $gte: minPrice, $lte: maxPrice },
+      };
+
+      if (sortCate !== "all") {
+        query.genre = {
+          $in: Array.isArray(sortCate) ? sortCate : [sortCate],
+        };
+      }
+
+      // Lấy các sản phẩm từ các người dùng không bị ẩn
+      Product.paginate(query, options, function (err, result) {
+        if (err) {
+          return res.status(500).json({ message: "Internal Server Error" });
         }
-        const options = {
-            page: page,
-            limit: limit,
-            // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
-            collation: {
-                locale: 'en',
-            },
-            sort: sorts,
-        };
-        const query = {
-          quantity: { $gt: 0 },
-          price: { $gte: minPrice, $lte: maxPrice },
-        };
+        return res.json(result);
+      });
+    });
+  }
 
-        if (sortCate !== "all") {
-          query.genre = {
-            $in: Array.isArray(sortCate) ? sortCate : [sortCate],
-          };
-        } 
-        Product.paginate(query, options, function (err, result) {
-            return res.json(result)
-        })
+  showProductStaff(req, res, next) {
+    const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
+    const limit = parseInt(req.query.limit) || 10000000000;
+    const sort = parseInt(req.query.sort) || -1; // Trang hiện tại, mặc định là trang 1
+    const options = {
+      page: page,
+      limit: limit,
+      // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
+      collation: {
+        locale: "en",
+      },
+      sort: { createdAt: sort },
+    };
+    Product.paginate({}, options, function (err, result) {
+      return res.json(result);
+    });
+  }
+
+  showProductUser(req, res, next) {
+    const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
+    const limit = parseInt(req.query.limit) || 10000000000;
+    const sort = parseInt(req.query.sort) || -1; // Trang hiện tại, mặc định là trang 1
+    const options = {
+      page: page,
+      limit: limit,
+      // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
+      collation: {
+        locale: "en",
+      },
+      sort: { createdAt: sort },
+    };
+    Product.paginate({ user: req.params.id }, options, function (err, result) {
+      return res.json(result);
+    });
+  }
+  showSold(req, res, next) {
+    const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
+    const limit = parseInt(req.query.limit) || 10000000000;
+    const sort = parseInt(req.query.sort) || -1; // Trang hiện tại, mặc định là trang 1
+    const sortPrice = parseInt(req.query.sortPrice);
+    const minPrice = parseInt(req.query.minPrice) || 0;
+    const maxPrice = parseInt(req.query.maxPrice) || 10000000000;
+    var sorts = { sold: sort };
+    if (sortPrice) {
+      sorts = { price: sortPrice };
     }
+    const options = {
+      page: page,
+      limit: limit,
+      // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
+      collation: {
+        locale: "en",
+      },
+      sort: sorts,
+    };
 
-    showProductStaff(req, res, next) {
-        const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
-        const limit = parseInt(req.query.limit) || 10000000000;
-        const sort = parseInt(req.query.sort) || -1; // Trang hiện tại, mặc định là trang 1
-        const options = {
-            page: page,
-            limit: limit,
-            // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
-            collation: {
-                locale: 'en',
-            },
-            sort: { createdAt: sort },
-        };
-        Product.paginate({}, options, function (err, result) {
-            return res.json(result)
-        })
-    }
+        // Tìm các người dùng có hidden là false
+        User.find({ hidden: false }, (err, users) => {
+          if (err) {
+            return res.status(500).json({ message: "Internal Server Error" });
+          }
 
-    showProductUser(req, res, next) {
-        const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
-        const limit = parseInt(req.query.limit) || 10000000000;
-        const sort = parseInt(req.query.sort) || -1; // Trang hiện tại, mặc định là trang 1
-        const options = {
-            page: page,
-            limit: limit,
-            // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
-            collation: {
-                locale: 'en',
-            },
-            sort: { createdAt: sort },
-        };
-        Product.paginate({ user: req.params.id }, options, function (err, result) {
-            return res.json(result)
-        })
-    }
-    showSold(req, res, next) {
-        const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
-        const limit = parseInt(req.query.limit) || 10000000000;
-        const sort = parseInt(req.query.sort) || -1; // Trang hiện tại, mặc định là trang 1
-        const sortPrice = parseInt(req.query.sortPrice)
-        const minPrice = parseInt(req.query.minPrice) || 0;
-        const maxPrice = parseInt(req.query.maxPrice) || 10000000000;
-        var sorts = { sold: sort }
-        if (sortPrice) {
-            sorts = { price: sortPrice }
-        }
-        const options = {
-            page: page,
-            limit: limit,
-            // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
-            collation: {
-                locale: 'en',
-            },
-            sort: sorts,
-        };
-        const query = { quantity: { $gt: 0 }, price: { $gte: minPrice, $lte: maxPrice } };
-        Product.paginate(query, options, function (err, result) {
-            return res.json(result)
-        })
-    }
-    showPrice(req, res, next) {
-        const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
-        const limit = parseInt(req.query.limit) || 10000000000;
-        const sort = parseInt(req.query.sort) || -1;
-        const minPrice = parseInt(req.query.minPrice) || 0;
-        const maxPrice = parseInt(req.query.maxPrice) || 10000000000;
+          // Lấy danh sách id của các người dùng không bị ẩn
+          const userIds = users.map((user) => user._id);
 
-        const options = {
-            page: page,
-            limit: limit,
-            // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
-            collation: {
-                locale: 'en',
-            },
-            sort: { reducedPrice: sort },
-        };
-        const query = { quantity: { $gt: 0 }, reducedPrice: { $gte: minPrice, $lte: maxPrice } };
-        Product.paginate(query, options, function (err, result) {
-            return res.json(result)
-        })
-    }
+          // Tạo truy vấn để lấy các sản phẩm của các người dùng này
 
-    get(req, res, next) {
-        try {
-            const id = req.params.id
-            Product.findById(id)
-                .then((Product => {
-                    res.json(Product)
-                }
-                ))
-                .catch(next => res.status(500).json({ error: 'Could not retrieve product.' }))
+              const query = {
+                user: { $in: userIds },
+                quantity: { $gt: 0 },
+                price: { $gte: minPrice, $lte: maxPrice },
+              };
 
-        } catch (error) {
-            res.status(500).json({ error: 'Could not retrieve product.' });
-        }
-    }
-
-    delete(req, res, next) {
-        Product.delete({ _id: req.params.id })
-            .then((Product => {
-                res.send(Product)
+          // Lấy các sản phẩm từ các người dùng không bị ẩn
+          Product.paginate(query, options, function (err, result) {
+            if (err) {
+              return res.status(500).json({ message: "Internal Server Error" });
             }
-            ))
-            .catch(next => res.status(500).json({ error: 'Could not retrieve product.' }))
-
-    } catch(error) {
-        res.status(500).json(error);
-
-    }
-
-    countByProduct(req, res, next) {
-        Product.aggregate([
-            {
-                $group: {
-                    _id: null, // Nhóm theo trường 'name'
-                    totalProducts: { $sum: 1 } // Đếm số lượng người dùng trong nhóm
-                }
-            }
-        ]).then((result) => {
-            res.json(result);
-        }).catch((error) => {
-            console.error(error);
-            res.status(500).json({ error: 'Could not retrieve the user count.' });
+            return res.json(result);
+          });
         });
-    }
-    
-    acceptProduct(req, res, next) {
-        Product.findByIdAndUpdate({_id: req.params.id}, {accept: true}).then((result) => {
-            res.json({...result, accept: true});
-        }).catch((error) => {
-            console.error(error);
-            res.status(500).json({ error: 'Could not retrieve the user count.' });
-        });
-    }
+  }
+  showPrice(req, res, next) {
+    const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
+    const limit = parseInt(req.query.limit) || 10000000000;
+    const sort = parseInt(req.query.sort) || -1;
+    const minPrice = parseInt(req.query.minPrice) || 0;
+    const maxPrice = parseInt(req.query.maxPrice) || 10000000000;
 
-    rejectProduct(req, res, next) {
-        Product.findByIdAndDelete(req.params.id).then((result) => {
-            res.json({...result, reject: true});
-        }).catch((error) => {
-            console.error(error);
-            res.status(500).json({ error: 'Could not retrieve the user count.' });
-        });
-    }
+    const options = {
+      page: page,
+      limit: limit,
+      // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
+      collation: {
+        locale: "en",
+      },
+      sort: { reducedPrice: sort },
+    };
+    const query = {
+      quantity: { $gt: 0 },
+      reducedPrice: { $gte: minPrice, $lte: maxPrice },
+    };
+    Product.paginate(query, options, function (err, result) {
+      return res.json(result);
+    });
+  }
 
+  get(req, res, next) {
+    try {
+      const id = req.params.id;
+      Product.findById(id)
+        .populate("user")
+        .then((Product) => {
+          res.json(Product);
+        })
+        .catch((next) =>
+          res.status(500).json({ error: "Could not retrieve product." })
+        );
+    } catch (error) {
+      res.status(500).json({ error: "Could not retrieve product." });
+    }
+  }
+
+  delete(req, res, next) {
+    Product.delete({ _id: req.params.id })
+      .then((Product) => {
+        res.send(Product);
+      })
+      .catch((next) =>
+        res.status(500).json({ error: "Could not retrieve product." })
+      );
+  }
+  catch(error) {
+    res.status(500).json(error);
+  }
+
+  countByProduct(req, res, next) {
+    Product.aggregate([
+      {
+        $group: {
+          _id: null, // Nhóm theo trường 'name'
+          totalProducts: { $sum: 1 }, // Đếm số lượng người dùng trong nhóm
+        },
+      },
+    ])
+      .then((result) => {
+        res.json(result);
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).json({ error: "Could not retrieve the user count." });
+      });
+  }
+
+  acceptProduct(req, res, next) {
+    Product.findByIdAndUpdate({ _id: req.params.id }, { accept: true })
+      .then((result) => {
+        res.json({ ...result, accept: true });
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).json({ error: "Could not retrieve the user count." });
+      });
+  }
+
+  rejectProduct(req, res, next) {
+    Product.findByIdAndDelete(req.params.id)
+      .then((result) => {
+        res.json({ ...result, reject: true });
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).json({ error: "Could not retrieve the user count." });
+      });
+  }
 }
-module.exports = new ProductControllers;
+module.exports = new ProductControllers();
