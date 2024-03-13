@@ -44,5 +44,8 @@ routerUser
     .route("/unblock/:id")
     .post(UserController.unblock)
 
+routerUser.route("/forgot-password/").post(UserController.forgotPassword);
+routerUser.route("/reset-password/").post(UserController.resetPassword);
+routerUser.route("/change-password/").post(UserController.changePassword);
 
 module.exports = routerUser
