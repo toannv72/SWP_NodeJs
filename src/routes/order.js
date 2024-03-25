@@ -12,6 +12,10 @@ routerOrder
 routerOrder
     .route("/user/pending")
     .get(OrderController.getUserPending)
+
+    routerOrder
+    .route("/user/Canceled/:id/:status")
+    .put(OrderController.putUserCanceled)
 routerOrder
     .route("/user/processing")
     .get(OrderController.getUserProcessing)
