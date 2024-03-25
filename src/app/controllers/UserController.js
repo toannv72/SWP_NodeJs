@@ -60,14 +60,20 @@ class UserController {
         .then((follow) => {
           follow.follow.splice({ user: req.params.userId });
           follow.save();
-          User.findById(req.params.userId).then((followAdd) => {
-            followAdd.followAdd.splice({ user: req.params.id });
-            followAdd.save();
-            return res.json(follow);
-          });
+
         })
         .catch((error) => {
           return res.json(error);
+        });
+      User.findById(req.params.userId)
+        .then((followAdd) => {
+          console.log(11111111,followAdd);
+          // followAdd.followAdd.splice({ user: req.params.id });
+          followAdd.followAdd = followAdd.followAdd.filter(userId => userId.user != req.params.id)
+          console.log(22222222222,followAdd);
+
+          followAdd.save();
+          return res.json([]);
         });
     } catch (error) {
       console.error("follow failed:", error);
