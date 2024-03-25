@@ -225,6 +225,8 @@ class UserController {
 
   getOne(req, res, next) {
     User.findById(req.params.id)
+      .populate("follow.user")
+      .populate("followAdd.user")
       .then((data) => res.json(data))
       .catch((err) => res.status(err));
   }
