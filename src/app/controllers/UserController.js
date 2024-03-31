@@ -41,6 +41,16 @@ class UserController {
             if (existingFollowAddIndex !== -1) {
               return res.json({ message: "Users have followed this1" });
             }
+            if (parseInt(follow?.follow?.length) > 3) {
+              User.findByIdAndUpdate(
+                req.params.id,
+                { role: "creator" },
+                { new: true }
+              )
+                .then((updatedUser) => {})
+                .catch((error) => {});
+            }
+
             followAdd.followAdd.push({ user: req.params.id });
             followAdd.save();
             return res.json(follow);
@@ -58,23 +68,26 @@ class UserController {
       // Tìm tài liệu artwork cần thêm like
       User.findById(req.params.id)
         .then((follow) => {
-          follow.follow.splice({ user: req.params.userId });
+          // follow.follow.splice({ user: req.params.userId });
+          follow.follow = follow.follow.filter(
+            (item) => item.user != req.params.userId
+          );
           follow.save();
-
         })
         .catch((error) => {
           return res.json(error);
         });
-      User.findById(req.params.userId)
-        .then((followAdd) => {
-          console.log(11111111,followAdd);
-          // followAdd.followAdd.splice({ user: req.params.id });
-          followAdd.followAdd = followAdd.followAdd.filter(userId => userId.user != req.params.id)
-          console.log(22222222222,followAdd);
+      User.findById(req.params.userId).then((followAdd) => {
+        console.log(11111111, followAdd);
+        // followAdd.followAdd.splice({ user: req.params.id });
+        followAdd.followAdd = followAdd.followAdd.filter(
+          (userId) => userId.user != req.params.id
+        );
+        console.log(22222222222, followAdd);
 
-          followAdd.save();
-          return res.json([]);
-        });
+        followAdd.save();
+        return res.json([]);
+      });
     } catch (error) {
       console.error("follow failed:", error);
     }
