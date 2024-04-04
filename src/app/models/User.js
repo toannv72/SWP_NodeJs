@@ -51,6 +51,10 @@ const User = new Schema(
       type: String,
       default: "",
     },
+    paypalAccount: {
+      type: String,
+      default: "",
+    },
   },
   {
     timestamps: true,
