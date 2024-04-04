@@ -19,8 +19,8 @@ const customOrderSchema = new Schema({
     spokes: { type: Number, required: false},
     email: { type: String, required: true },
     phone: { type: String, required: true },
-    image: { type: String, required: true },
-    material: [{ type: String, enum: ['Tranh', 'Trang trí', 'Nghệ thuật'], required: true }],
+    image: [{ type: String }],
+    material: [{ type: String, required: true }],
     status: {
         type: String,
         enum: ['Pending', 'Deposit','Processing', 'Shipped', 'Delivered', 'Canceled', 'Returned'],
