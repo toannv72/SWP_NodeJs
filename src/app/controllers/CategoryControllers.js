@@ -5,9 +5,7 @@ class CategoryControllers {
   put(req, res, next) {
     Category.findByIdAndUpdate(req.params.id, req.body)
       .then((Category) => {
-        console.log('====================================');
-        console.log(Category);
-        console.log('====================================');
+      
         res.json(Category);
       })
       .catch((next) => res.json(next));

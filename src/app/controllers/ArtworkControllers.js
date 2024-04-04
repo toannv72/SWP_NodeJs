@@ -103,14 +103,17 @@ class ProductControllers {
       );
     }
   }
-
   searchGenre(req, res, next) {
     function escapeRegExp(text) {
-      return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+      return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&").replace(/[^\w\s&]/g, "\\$&");
+      // Thêm replace(/[^\w\s]/g, "\\$&") để giữ lại ký tự không phải chữ cái hoặc khoảng trắng
     }
     const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
     const limit = parseInt(req.query.limit) || 15; // Số lượng phần tử trên mỗi trang, mặc định là 10
     const formData = req.query.name;
+    console.log('====================================');
+    console.log(formData);
+    console.log('====================================');
     const escapedSearchTerm = escapeRegExp(formData);
     const regex = new RegExp(escapedSearchTerm, "i");
     const options = {
@@ -130,34 +133,10 @@ class ProductControllers {
         .catch(next);
     } else {
       Artwork.paginate(
-        { genre: { $regex: regex } },
+        { genre: { $regex: regex } }, // Sử dụng $regex để áp dụng biểu thức chính quy
         options,
         function (err, result) {
-          // if (result.totalPages < result.page) {
-          //   const options1 = {
-          //     page: result.totalPages,
-          //     limit: 9,
-          //     // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
-          //     collation: {
-          //       locale: "en",
-          //     },
-          //   };
-          //   Artwork.paginate(
-          //     { genre: { $regex: escapedSearchTerm } },
-          //     options1,
-          //     function (err, data) {
-          //       return res.json({
-          //         products: data.docs,
-          //         totalPages: data.totalPages,
-          //         page: result.totalPages,
-          //         prevPage: data.prevPage,
-          //         nextPage: data.nextPage,
-          //         totalDocs: data.totalDocs,
-          //         search: formData,
-          //       });
-          //     }
-          //   );
-          // } else {
+
           return res.json({
             products: result.docs,
             totalPages: result.totalPages,
@@ -168,10 +147,53 @@ class ProductControllers {
             search: formData,
           });
         }
-        // }
       );
     }
   }
+  // searchGenre(req, res, next) {
+  //   function escapeRegExp(text) {
+  //     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+  //   }
+  //   const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
+  //   const limit = parseInt(req.query.limit) || 15; // Số lượng phần tử trên mỗi trang, mặc định là 10
+  //   const formData = req.query.name;
+  //   const escapedSearchTerm = escapeRegExp(formData);
+  //   const regex = new RegExp(escapedSearchTerm, "i");
+  //   const options = {
+  //     page: page,
+  //     limit: limit,
+
+  //     // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
+  //     collation: {
+  //       locale: "en",
+  //     },
+  //   };
+  //   if (formData === "") {
+  //     Artwork.find({})
+  //       .then((movies) => {
+  //         res.json({ movie: [movies] });
+  //       })
+  //       .catch(next);
+  //   } else {
+  //     Artwork.paginate(
+  //       { genre: { $in: [regex] } },
+  //       options,
+  //       function (err, result) {
+
+  //         return res.json({
+  //           products: result.docs,
+  //           totalPages: result.totalPages,
+  //           page: result.page,
+  //           prevPage: result.prevPage,
+  //           nextPage: result.nextPage,
+  //           totalDocs: result.totalDocs,
+  //           search: formData,
+  //         });
+  //       }
+  //       // }
+  //     );
+  //   }
+  // }
   unlikeArtwork(req, res, next) {
     try {
       var checkTokenValid = jwt.verify(
@@ -201,7 +223,7 @@ class ProductControllers {
               return res.json(error);
             });
         })
-        .catch((error) => {});
+        .catch((error) => { });
     } catch (error) {
       console.error("Unlike failed:", error.message);
     }
@@ -236,7 +258,7 @@ class ProductControllers {
               return res.json(error);
             });
         })
-        .catch((error) => {});
+        .catch((error) => { });
 
       // Kiểm tra xem người dùng đã like trước đó hay chưa
     } catch (error) {
@@ -273,7 +295,7 @@ class ProductControllers {
               return res.json(error);
             });
         })
-        .catch((error) => {});
+        .catch((error) => { });
       // Tìm tài liệu artwork cần thêm like
 
       // Kiểm tra xem người dùng đã like trước đó hay chưa
@@ -302,7 +324,7 @@ class ProductControllers {
             });
           });
       })
-      .catch((error) => {});
+      .catch((error) => { });
 
     // res.send(`oke`)
   }
@@ -313,7 +335,11 @@ class ProductControllers {
     const sort = parseInt(req.query.sort) || -1;
     const cate = req.query.cate || "all";
     var sorts = { createdAt: sort };
-
+    function escapeRegExp(text) {
+      return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+    }
+    const escapedSearchTerm = escapeRegExp(cate);
+    const regex = new RegExp(escapedSearchTerm, "i");
     const options = {
       page: page,
       limit: limit,
@@ -329,7 +355,7 @@ class ProductControllers {
     query.user = { $in: userIds };
     if (cate !== "all") {
       query.genre = {
-        $in: Array.isArray(cate) ? cate : [cate],
+        $in: Array.isArray(regex) ? regex : [regex],
       };
     }
     Artwork.paginate(query, options, function (err, result) {

@@ -182,13 +182,13 @@ class UserController {
       return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
     }
     const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là trang 1
-    const limit = parseInt(req.query.limit) || 10; // Số lượng phần tử trên mỗi trang, mặc định là 10
+    const limit = parseInt(req.query.limit) || 1000; // Số lượng phần tử trên mỗi trang, mặc định là 10
     const formData = req.query.name;
     const escapedSearchTerm = escapeRegExp(formData);
-
+    const regex = new RegExp(escapedSearchTerm, "i");
     const options = {
       page: page,
-      limit: 5,
+      limit: limit,
 
       // tùy chọn xác định cách sắp xếp và so sánh trong truy vấn.
       collation: {
@@ -197,7 +197,7 @@ class UserController {
     };
 
     User.paginate(
-      { name: { $regex: escapedSearchTerm }, hidden: false },
+      { name: { $regex: regex }, hidden: false },
       options,
       function (err, result) {
         return res.json({
