@@ -48,7 +48,7 @@ const OrderSchema = new mongoose.Schema(
     payment: {
       type: String,
       maxLength: 255,
-      enum: ["Cash", "Transfer", "Pending", "Canceled"],
+      enum: ["Cash", "Paypal", "Transfer", "Pending", "Canceled"],
       default: "Pending", // Trạng thái mặc định là "Chờ xử lý"
     },
     deletedAt: { type: String, maxLength: 255, default: null },
