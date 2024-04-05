@@ -50,10 +50,10 @@ class CustomOrderController {
       Promise.all([
         CustomOrder.find({
           user: checkTokenValid.user._id,
-        }),
+        }).populate("freelancer"),
         CustomOrder.find({
           freelancer: checkTokenValid.user._id,
-        }),
+        }).populate("freelancer"),
       ]).then((results) => {
         const [userOrders, freelancerOrders] = results;
         res.json({
@@ -90,11 +90,11 @@ class CustomOrderController {
         CustomOrder.find({
           user: checkTokenValid.user._id,
           status: "Pending",
-        }),
+        }).populate("freelancer"),
         CustomOrder.find({
           freelancer: checkTokenValid.user._id,
           status: "Pending",
-        }),
+        }).populate("freelancer"),
       ]).then((results) => {
         const [userOrders, freelancerOrders] = results;
         res.json({
@@ -158,11 +158,11 @@ class CustomOrderController {
         CustomOrder.find({
           user: checkTokenValid.user._id,
           status: "Processing",
-        }),
+        }).populate("freelancer"),
         CustomOrder.find({
           freelancer: checkTokenValid.user._id,
           status: "Processing",
-        }),
+        }).populate("freelancer"),
       ]).then((results) => {
         const [userOrders, freelancerOrders] = results;
         res.json({
@@ -214,11 +214,11 @@ class CustomOrderController {
         CustomOrder.find({
           user: checkTokenValid.user._id,
           status: "Shipped",
-        }),
+        }).populate("freelancer"),
         CustomOrder.find({
           freelancer: checkTokenValid.user._id,
           status: "Shipped",
-        }),
+        }).populate("freelancer"),
       ]).then((results) => {
         const [userOrders, freelancerOrders] = results;
         res.json({
@@ -253,11 +253,11 @@ class CustomOrderController {
         CustomOrder.find({
           user: checkTokenValid.user._id,
           status: "Delivered",
-        }),
+        }).populate("freelancer"),
         CustomOrder.find({
           freelancer: checkTokenValid.user._id,
           status: "Delivered",
-        }),
+        }).populate("freelancer"),
       ]).then((results) => {
         const [userOrders, freelancerOrders] = results;
         res.json({
@@ -292,11 +292,11 @@ class CustomOrderController {
         CustomOrder.find({
           user: checkTokenValid.user._id,
           status: "Canceled",
-        }),
+        }).populate("freelancer"),
         CustomOrder.find({
           freelancer: checkTokenValid.user._id,
           status: "Canceled",
-        }),
+        }).populate("freelancer"),
       ]).then((results) => {
         const [userOrders, freelancerOrders] = results;
         res.json({
